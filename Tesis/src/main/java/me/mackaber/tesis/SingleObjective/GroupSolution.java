@@ -26,7 +26,7 @@ public class GroupSolution extends AbstractGenericSolution<List<User>, Combinati
             setVariableValue(i, solution.getVariableValue(i));
         }
 
-        attributes = new HashMap<>(solution.attributes);
+        attributes = new HashMap<Object, Object>(solution.attributes);
     }
 
     @Override
