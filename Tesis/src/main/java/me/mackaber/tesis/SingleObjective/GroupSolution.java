@@ -1,7 +1,9 @@
 package me.mackaber.tesis.SingleObjective;
 
 import me.mackaber.tesis.Util.CombinationProblem;
+import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.User;
+import org.apache.commons.math3.analysis.function.Sin;
 import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.solution.impl.AbstractGenericSolution;
 
@@ -26,7 +28,7 @@ public class GroupSolution extends AbstractGenericSolution<List<User>, Combinati
             setVariableValue(i, solution.getVariableValue(i));
         }
 
-        attributes = new HashMap<Object, Object>(solution.attributes);
+        attributes = new HashMap<>(solution.attributes);
     }
 
     @Override
@@ -42,5 +44,14 @@ public class GroupSolution extends AbstractGenericSolution<List<User>, Combinati
     @Override
     public List<HashMap<String, String>> getSampleSolution(int n) {
         return null;
+    }
+
+    @Override
+    public Double evaluate(Function function) {
+        // HACK!!!, not for standard use
+        SingleObjectiveGrouping grouping = (SingleObjectiveGrouping) problem;
+        grouping.setObjectiveFunction(function);
+        grouping.evaluate(this);
+        return getObjective(0);
     }
 }

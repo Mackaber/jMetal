@@ -75,6 +75,21 @@ public class SingleObjectiveGrouping extends CombinationProblem {
         return new DefaultGroupingSolution(this);
     }
 
+    @Override
+    public List<User> getUsers() {
+        return users;
+    }
+
+    @Override
+    public int getMinSize() {
+        return min_size;
+    }
+
+    @Override
+    public int getMaxSize() {
+        return max_size;
+    }
+
     private List<User> readProblem(String file) throws IOException {
         List<User> problem_users = new ArrayList<>();
 
@@ -95,20 +110,5 @@ public class SingleObjectiveGrouping extends CombinationProblem {
         }
         usersSize = problem_users.size();
         return problem_users;
-    }
-
-    @Override
-    public List<User> getUsers() {
-        return users;
-    }
-
-    @Override
-    public int getMinSize() {
-        return min_size;
-    }
-
-    @Override
-    public int getMaxSize() {
-        return max_size;
     }
 }

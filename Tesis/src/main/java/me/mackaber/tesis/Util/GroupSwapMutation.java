@@ -93,18 +93,20 @@ public class GroupSwapMutation<T> implements MutationOperator<GroupingSolution<T
                 List<User> group1 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
                 List<User> group2 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
 
-                while (group1 == group2 | group1.size() == 0 | group2.size() == 0) {
-                    while (group1.size() <= combinationProblem.getMinSize() + 1 | group1.size() == 0) {
-                        group1 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
-                    }
-
-                    while (group2.size() > combinationProblem.getMaxSize() - 1 | group2.size() == 0) {
-                        group2 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
-                    }
+//                while (group1 == group2 | group1.size() == 0 | group2.size() == 0) {
+//                    while (group1.size() <= combinationProblem.getMinSize() + 1 | group1.size() == 0) {
+//                        group1 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
+//                    }
+//
+//                    while (group2.size() > combinationProblem.getMaxSize() - 1 | group2.size() == 0) {
+//                        group2 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
+//                    }
+//                }
+                if (group1.size() > 2 && group2.size() > 0) {
+                    User user = group1.get(positionRandomGenerator.getRandomValue(0, group1.size() - 1));
+                    group2.add(user);
+                    group1.remove(user);
                 }
-                User user = group1.get(positionRandomGenerator.getRandomValue(0, group1.size() - 1));
-                group2.add(user);
-                group1.remove(user);
             }
         }
     }

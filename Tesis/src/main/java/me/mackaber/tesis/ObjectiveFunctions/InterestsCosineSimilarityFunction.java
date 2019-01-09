@@ -13,9 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.Float.NaN;
+
 public class InterestsCosineSimilarityFunction extends InterestsFunction {
     private final String interestTreeFile;
-    private final HashMap<String,HashMap<String,Double>> interestsTree = new HashMap<>();
+    private final HashMap<String, HashMap<String, Double>> interestsTree = new HashMap<>();
 
     public InterestsCosineSimilarityFunction(String interestTreeFile) throws FileNotFoundException {
         this.interestTreeFile = interestTreeFile;
@@ -28,18 +30,18 @@ public class InterestsCosineSimilarityFunction extends InterestsFunction {
         JsonElement interestsJson = parser.parse(reader);
 
         JsonArray interests = interestsJson.getAsJsonArray();
-        for(JsonElement entry: interests){
+        for (JsonElement entry : interests) {
             JsonObject interest = (JsonObject) entry;
             JsonArray path = interest.get("path").getAsJsonArray();
 
-            HashMap<String,Double> path_values = new HashMap<>();
+            HashMap<String, Double> path_values = new HashMap<>();
             Double i = (double) path.size();
-            for(JsonElement element: path.getAsJsonArray()){
-                path_values.put(element.getAsString(),i);
+            for (JsonElement element : path.getAsJsonArray()) {
+                path_values.put(element.getAsString(), i);
                 i--;
             }
-            path_values.put(interest.get("raw_name").getAsString(),0.0);
-            interestsTree.put(interest.get("raw_name").getAsString(),path_values);
+            path_values.put(interest.get("raw_name").getAsString(), 0.0);
+            interestsTree.put(interest.get("raw_name").getAsString(), path_values);
         }
     }
 
@@ -79,7 +81,8 @@ public class InterestsCosineSimilarityFunction extends InterestsFunction {
             }
         }
         Mean mean = new Mean();
-        return mean.evaluate(ArrayUtils.toPrimitive(evals.toArray(new Double[evals.size()])));
+        double result = 1 - mean.evaluate(ArrayUtils.toPrimitive(evals.toArray(new Double[evals.size()])));
+        return result < 0 ? 0.0 : result;
     }
 
     @Override

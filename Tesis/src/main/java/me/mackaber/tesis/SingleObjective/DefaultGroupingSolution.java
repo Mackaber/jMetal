@@ -1,6 +1,7 @@
 package me.mackaber.tesis.SingleObjective;
 
 import me.mackaber.tesis.Util.CombinationProblem;
+import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.RandomFunctions;
 import me.mackaber.tesis.Util.User;
 import org.uma.jmetal.solution.Solution;
@@ -56,7 +57,7 @@ public class DefaultGroupingSolution extends AbstractGenericSolution<List<User>,
         JavaRandomGenerator random = new JavaRandomGenerator();
         BoundedRandomGenerator<Integer> indexSelector = random::nextInt;
         for(int i = 0; i<n; i++) {
-            List<User> group = getVariableValue(indexSelector.getRandomValue(0,getNumberOfVariables()));
+            List<User> group = getVariableValue(indexSelector.getRandomValue(0,getNumberOfVariables() - 1));
             for(User user:group) {
                 HashMap<String,String> sampleGroup = new HashMap<>();
                 sampleGroup.put("group",i+"");
@@ -66,23 +67,16 @@ public class DefaultGroupingSolution extends AbstractGenericSolution<List<User>,
                 sampleGroup.put("part_prc",user.getPart_prc() + "");
                 sampleGroups.add(sampleGroup);
             }
-            HashMap<String,String> result = new HashMap<>();
-            result.put("group","Eval:");
-            result.put("id",getObjective(0) + "");
-            result.put("level","");
-            result.put("interests","");
-            result.put("part_prc","");
-            sampleGroups.add(result);
-
-            HashMap<String,String> spacer = new HashMap<>();
-            spacer.put("group","");
-            spacer.put("id","");
-            spacer.put("level","");
-            spacer.put("interests","");
-            spacer.put("part_prc","");
-            sampleGroups.add(spacer);
         }
-
         return sampleGroups;
+    }
+
+    @Override
+    public Double evaluate(Function function) {
+        // HACK!!!, not for standard use
+        SingleObjectiveGrouping grouping = (SingleObjectiveGrouping) problem;
+        grouping.setObjectiveFunction(function);
+        grouping.evaluate(this);
+        return getObjective(0);
     }
 }
