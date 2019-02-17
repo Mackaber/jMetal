@@ -12,10 +12,12 @@ import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.SelectionOperator;
 import org.uma.jmetal.operator.impl.crossover.NPointCrossover;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
+import org.uma.jmetal.solution.BinarySolution;
 import org.uma.jmetal.util.AlgorithmRunner;
 import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.comparator.DominanceComparator;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
+import org.uma.jmetal.util.evaluator.impl.MultithreadedSolutionListEvaluator;
 import org.uma.jmetal.util.fileoutput.SolutionListOutput;
 import org.uma.jmetal.util.fileoutput.impl.DefaultFileOutputContext;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
@@ -33,10 +35,13 @@ public class InterestFunctionTesting {
         MutationOperator<GroupingSolution<List<User>>> mutation;
         SelectionOperator<List<GroupingSolution<List<User>>>,GroupingSolution<List<User>>> selection;
 
-        SingleObjectiveGrouping problem = new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_200.csv");
+//        SingleObjectiveGrouping problem = new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_2000.csv");
+        SingleObjectiveGrouping problem = new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_10001.csv");
+
 
         problem.setGroupSizeRange(3, 6)
                 .setObjectiveFunction(new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json"))
+//                .setObjectiveFunction(new LevelFunction())
                 .setCentralTendencyMeasure(new Mean())
                 .build();
 
@@ -52,6 +57,7 @@ public class InterestFunctionTesting {
                 .setPopulationSize(popSize)
                 .setMaxEvaluations(popSize*genNum)
                 .setSelectionOperator(selection)
+                .setSolutionListEvaluator(new MultithreadedSolutionListEvaluator<>(10, problem))
                 .build();
 
         AlgorithmRunner algorithmRunner = new AlgorithmRunner.Executor(algorithm).execute();

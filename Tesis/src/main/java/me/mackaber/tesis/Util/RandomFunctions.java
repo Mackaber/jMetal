@@ -1,6 +1,7 @@
 package me.mackaber.tesis.Util;
 
 import org.uma.jmetal.util.pseudorandom.BoundedRandomGenerator;
+import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 import org.uma.jmetal.util.pseudorandom.RandomGenerator;
 import org.uma.jmetal.util.pseudorandom.impl.JavaRandomGenerator;
 
@@ -8,7 +9,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RandomFunctions {
-    public static List<User> generateRandomGroup(List<User> pool,CombinationProblem problem) {
+
+    public static List<User> generateRandomGroup(List<User> pool, CombinationProblem problem) {
+        List<User> generatedUserGroup = new ArrayList<>();
+        JavaRandomGenerator random = new JavaRandomGenerator();
+        int size = random.nextInt(problem.getMinSize(), problem.getMaxSize());
+        if (pool.size() <= problem.getMaxSize()) {
+            generatedUserGroup.addAll(pool);
+            pool.clear();
+        } else
+            for (int i = 0; i < size; i++) {
+                int id = random.nextInt(0, pool.size() - 1);
+                User user = pool.get(id);
+                generatedUserGroup.add(user);
+                pool.remove(user);
+            }
+        return generatedUserGroup;
+    }
+
+    public static List<User> generateRandomGroup_(List<User> pool, CombinationProblem problem) {
         JavaRandomGenerator random = new JavaRandomGenerator();
         int size = random.nextInt(problem.getMinSize(), problem.getMaxSize());
         BoundedRandomGenerator<Integer> indexSelector = random::nextInt;

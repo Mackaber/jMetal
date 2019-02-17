@@ -15,6 +15,11 @@ import java.util.List;
 
 public class DefaultGroupingSolution extends AbstractGenericSolution<List<User>, CombinationProblem>  implements GroupingSolution<List<User>> {
 
+    // Horrible hack for taking advantage of polymorphism
+    public DefaultGroupingSolution(CombinationProblem problem, int thing) {
+        super(problem);
+    }
+
     public DefaultGroupingSolution(CombinationProblem problem) {
         super(problem);
         ArrayList<User> users = (ArrayList<User>) problem.getUsers();

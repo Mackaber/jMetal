@@ -39,7 +39,7 @@ public class CustomNSGAIIBuilder<S extends Solution<?>> extends NSGAIIBuilder {
         return algorithm;
     }
 
-    class CustomNSGAII extends NSGAII {
+    public class CustomNSGAII extends NSGAII {
         public CustomNSGAII(Problem problem, int maxEvaluations, int populationSize, CrossoverOperator crossoverOperator, MutationOperator mutationOperator,
                             SelectionOperator selectionOperator, SolutionListEvaluator evaluator) {
             super(problem, maxEvaluations, populationSize, crossoverOperator, mutationOperator, selectionOperator, evaluator);

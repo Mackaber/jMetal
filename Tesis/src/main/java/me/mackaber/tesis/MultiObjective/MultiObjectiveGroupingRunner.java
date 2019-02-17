@@ -8,6 +8,7 @@ import me.mackaber.tesis.SingleObjective.GroupingSolution;
 import me.mackaber.tesis.Util.GroupSwapMutation;
 import me.mackaber.tesis.Util.User;
 import org.apache.commons.math3.stat.descriptive.moment.GeometricMean;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAIIBuilder;
 import org.uma.jmetal.operator.MutationOperator;
@@ -17,6 +18,7 @@ import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
 import org.uma.jmetal.util.AlgorithmRunner;
 import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
+import org.uma.jmetal.util.evaluator.impl.MultithreadedSolutionListEvaluator;
 import org.uma.jmetal.util.fileoutput.SolutionListOutput;
 import org.uma.jmetal.util.fileoutput.impl.DefaultFileOutputContext;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
@@ -33,16 +35,19 @@ public class MultiObjectiveGroupingRunner {
         MutationOperator<GroupingSolution<List<User>>> mutation;
         SelectionOperator<List<GroupingSolution<List<User>>>,GroupingSolution<List<User>>> selection;
 
-        problem = new MultiObjectiveGrouping("Tesis/src/main/resources/synthetic_200.csv");
+        problem = new MultiObjectiveGrouping("Tesis/src/main/resources/synthetic_2000.csv");
 
         problem.setGroupSizeRange(3, 6)
-                .addObjectiveFunction(new GroupSizeFunction())
+                //.addObjectiveFunction(new GroupSizeFunction())
+                //.addObjectiveFunction(new ParticipationStyleFunction())
                 .addObjectiveFunction(new LevelFunction())
-                .addObjectiveFunction(new ParticipationStyleFunction())
                 .setInterestsFunction(new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json"))
-                .setCentralTendencyMeasure(new GeometricMean())
+                .setCentralTendencyMeasure(new Mean())
                 .build();
 
+
+        int popSize = 200;
+        int genNum = 210;
 
         NPointCrossover crossover = new NPointCrossover(0.9,problem.getNumberOfVariables());
         double mutationProbability = 1.0 / problem.getNumberOfVariables();
@@ -50,8 +55,9 @@ public class MultiObjectiveGroupingRunner {
         selection = new BinaryTournamentSelection<>(new RankingAndCrowdingDistanceComparator<>());
         algorithm = new CustomNSGAIIBuilder(problem, crossover, mutation)
                         .setSelectionOperator(selection)
-                        .setPopulationSize(100)
-                        .setMaxEvaluations(25000)
+                        .setPopulationSize(popSize)
+                        .setMaxEvaluations(genNum*popSize)
+                        .setSolutionListEvaluator(new MultithreadedSolutionListEvaluator<>(10, problem))
                         .build();
 
         AlgorithmRunner algorithmRunner = new AlgorithmRunner.Executor(algorithm).execute();

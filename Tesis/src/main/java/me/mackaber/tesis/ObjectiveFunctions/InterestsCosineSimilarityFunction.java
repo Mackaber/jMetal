@@ -77,7 +77,10 @@ public class InterestsCosineSimilarityFunction extends InterestsFunction {
         List<Double> evals = new ArrayList<>();
         for (int i = 0; i < variableValue.size() - 1; i++) {
             for (int j = i + 1; j < variableValue.size(); j++) {
-                evals.add(cosineSimilarity(variableValue.get(i).getInterestVector(), variableValue.get(j).getInterestVector()));
+                HashMap<String, Double> vect1 = (HashMap<String, Double>) variableValue.get(i).getInterestVector().clone();
+                HashMap<String, Double> vect2 = (HashMap<String, Double>) variableValue.get(j).getInterestVector().clone();
+
+                evals.add(cosineSimilarity(vect1,vect2));
             }
         }
         Mean mean = new Mean();

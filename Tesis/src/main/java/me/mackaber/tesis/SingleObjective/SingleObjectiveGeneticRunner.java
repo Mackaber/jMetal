@@ -20,6 +20,7 @@ import org.uma.jmetal.util.AlgorithmRunner;
 import org.uma.jmetal.util.JMetalLogger;
 import org.uma.jmetal.util.comparator.DominanceComparator;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
+import org.uma.jmetal.util.evaluator.impl.MultithreadedSolutionListEvaluator;
 import org.uma.jmetal.util.fileoutput.SolutionListOutput;
 import org.uma.jmetal.util.fileoutput.impl.DefaultFileOutputContext;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
@@ -35,39 +36,43 @@ public class SingleObjectiveGeneticRunner {
         Algorithm<GroupingSolution<List<User>>> algorithm;
 //        CrossoverOperator<GroupingSolution<List<User>>> crossover;
         MutationOperator<GroupingSolution<List<User>>> mutation;
-        SelectionOperator<List<GroupingSolution<List<User>>>,GroupingSolution<List<User>>> selection;
+        SelectionOperator<List<GroupingSolution<List<User>>>, GroupingSolution<List<User>>> selection;
 
-        SingleObjectiveGrouping problem = new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_200.csv");
+        SingleObjectiveGrouping problem = new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_2000.csv");
 
-        WeightedFunction function = new WeightedFunction("Tesis/src/main/resources/custom_interests.json");
-        function.setW1(1.0); // Group Size
-        function.setW2(1.0); // Interests
-        function.setW3(1.0); // Level
-        function.setW4(1.0); // Participation Style
+        WeightedFunction function = new WeightedFunction()
+                .addObjectiveFunction(1.0, new GroupSizeFunction())
+                .addObjectiveFunction(1.0, new ParticipationStyleFunction())
+                .addObjectiveFunction(1.0, new LevelFunction())
+                .setInterestsFunction(1.0, new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json"));
 
         problem.setGroupSizeRange(3, 6)
                 .setObjectiveFunction(function)
                 .setCentralTendencyMeasure(new Mean())
                 .build();
 
-        NPointCrossover crossover = new NPointCrossover(0.9,problem.getNumberOfVariables());
+        NPointCrossover crossover = new NPointCrossover(0.9, problem.getNumberOfVariables());
         double mutationProbability = 1.0 / problem.getNumberOfVariables();
         mutation = new GroupSwapMutation<>(mutationProbability, problem);
         selection = new BinaryTournamentSelection<>(new RankingAndCrowdingDistanceComparator<>());
 
+        int popSize = 20;
+        int genNum = 21;
+
         algorithm = new CustomGeneticBuilder<>(problem, crossover, mutation)
-                .setPopulationSize(100)
-                .setMaxEvaluations(25000)
+                .setPopulationSize(popSize)
+                .setMaxEvaluations(popSize * genNum)
                 .setSelectionOperator(selection)
+                .setSolutionListEvaluator(new MultithreadedSolutionListEvaluator<>(10, problem))
                 .build();
 
         AlgorithmRunner algorithmRunner = new AlgorithmRunner.Executor(algorithm).execute();
 
-        GroupingSolution<List<User>> solution = algorithm.getResult() ;
-        List<GroupingSolution<List<User>>> population = new ArrayList<>(1) ;
-        population.add(solution) ;
+        GroupingSolution<List<User>> solution = algorithm.getResult();
+        List<GroupingSolution<List<User>>> population = new ArrayList<>(1);
+        population.add(solution);
 
-        long computingTime = algorithmRunner.getComputingTime() ;
+        long computingTime = algorithmRunner.getComputingTime();
 
         new SolutionListOutput(population)
                 .setSeparator("\t")
@@ -77,6 +82,9 @@ public class SingleObjectiveGeneticRunner {
 
         CustomGeneticBuilder.CustomGenerationanGeneticAlgorithm geneticAlgorithm = (CustomGeneticBuilder.CustomGenerationanGeneticAlgorithm) algorithm;
 
+        JMetalLogger.logger.info("Improvement: " + geneticAlgorithm.getImprovements());
+        JMetalLogger.logger.info("Level: " + solution.evaluate(new LevelFunction()));
+        JMetalLogger.logger.info("Interests : " + solution.evaluate(new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json")));
         JMetalLogger.logger.info("Improvement: " + geneticAlgorithm.getImprovements());
         JMetalLogger.logger.info("Total execution time: " + computingTime + "ms");
         JMetalLogger.logger.info("Random seed: " + JMetalRandom.getInstance().getSeed());

@@ -35,6 +35,11 @@ public class MultiObjectiveGrouping extends CombinationProblem {
         this.functions = new ArrayList<>();
     }
 
+    public MultiObjectiveGrouping() {
+        this.userFile = "";
+        this.functions = new ArrayList<>();
+    }
+
     public MultiObjectiveGrouping setGroupSizeRange(int min_size, int max_size) {
         this.min_size = min_size;
         this.max_size = max_size;
@@ -65,12 +70,27 @@ public class MultiObjectiveGrouping extends CombinationProblem {
         setName("MultiObjectiveGrouping");
     }
 
+    // Converts a Single Objective Solution into multiObjective decomposing its values
+    public DefaultGroupingSolution createHolder(DefaultGroupingSolution solution) {
+        setNumberOfVariables(solution.getNumberOfVariables());
+        setNumberOfObjectives(functions.size());
+
+        DefaultGroupingSolution holder = new DefaultGroupingSolution(this,0);
+
+        for (int i = 0; i < solution.getNumberOfVariables(); i++) {
+            holder.setVariableValue(i, solution.getVariableValue(i));
+        }
+
+        evaluate(holder);
+        return holder;
+    }
+
     @Override
     public void evaluate(GroupingSolution<List<User>> solution) {
         double fitness;
         int j = 0;
 
-        for(Function function: functions) {
+        for (Function function : functions) {
             double[] results = new double[getNumberOfVariables()];
             for (int i = 0; i < solution.getNumberOfVariables(); i++) {
                 if (solution.getVariableValue(i).size() > 0) // The solution may contain empty groups as variables
@@ -82,7 +102,7 @@ public class MultiObjectiveGrouping extends CombinationProblem {
             }
 
             fitness = ct_measure.evaluate(results);
-            solution.setObjective(j,fitness);
+            solution.setObjective(j, fitness);
             j++;
         }
     }
@@ -107,6 +127,11 @@ public class MultiObjectiveGrouping extends CombinationProblem {
         return new DefaultGroupingSolution(this);
     }
 
+    @Override
+    public String getName() {
+        return "MultiObjectiveGrouping_" + usersSize;
+    }
+
     private List<User> readProblem(String file) throws IOException {
         List<User> problem_users = new ArrayList<>();
 
@@ -119,7 +144,7 @@ public class MultiObjectiveGrouping extends CombinationProblem {
                     .setInterests(interests)
                     .setPart_prc(Double.parseDouble(record.get(5)))
                     .setPart_time(Double.parseDouble(record.get(6)));
-            if(interestsFunction != null) {
+            if (interestsFunction != null) {
                 user.setInterestVector(interestsFunction.getInterestVector(interests));
             }
             problem_users.add(user);

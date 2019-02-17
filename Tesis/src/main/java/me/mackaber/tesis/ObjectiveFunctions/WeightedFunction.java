@@ -1,64 +1,76 @@
 package me.mackaber.tesis.ObjectiveFunctions;
 
+import me.mackaber.tesis.MultiObjective.MultiObjectiveGrouping;
 import me.mackaber.tesis.SingleObjective.GroupingSolution;
 import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.InterestsFunction;
 import me.mackaber.tesis.Util.User;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class WeightedFunction extends InterestsFunction {
-    private final GroupSizeFunction groupSizeFunction;
-    private final InterestsCosineSimilarityFunction interestsFunction;
-    private final LevelFunction levelFunction;
-    private final ParticipationStyleFunction participationStyleFunction;
-    private final String interestsFile;
-    private double w1 = 1.0;
-    private double w2 = 1.0;
-    private double w3 = 1.0;
-    private double w4 = 1.0;
+    private ArrayList<Function> functions;
+    private ArrayList<Double> weights;
+    private InterestsFunction interestsFunction = null;
 
-
-    public WeightedFunction(String interestsFile) throws FileNotFoundException {
-        this.interestsFile = interestsFile;
-        groupSizeFunction = new GroupSizeFunction();
-        interestsFunction = new InterestsCosineSimilarityFunction(interestsFile);
-        levelFunction = new LevelFunction();
-        participationStyleFunction = new ParticipationStyleFunction();
+    public WeightedFunction()  {
+        this.functions = new ArrayList<>();
+        this.weights = new ArrayList<>();
     }
 
-    public WeightedFunction setW1(double w1) {
-        this.w1 = w1;
+    public WeightedFunction WeightedFunction()  {
+        this.functions = new ArrayList<>();
         return this;
     }
 
-    public WeightedFunction setW2(double w2) {
-        this.w2 = w2;
+    public WeightedFunction addObjectiveFunction(double weight, Function function) {
+        this.functions.add(function);
+        this.weights.add(weight);
         return this;
     }
 
-    public WeightedFunction setW3(double w3) {
-        this.w3 = w3;
+    public WeightedFunction setInterestsFunction(double weight, InterestsFunction function) {
+        this.functions.add(function);
+        this.weights.add(weight);
+        this.interestsFunction = function;
         return this;
     }
 
-    public WeightedFunction setW4(double w4) {
-        this.w4 = w4;
+    public ArrayList<Function> getFunctions() {
+        return functions;
+    }
+
+    public WeightedFunction setFunctions(ArrayList<Function> functions) {
+        this.functions = functions;
         return this;
     }
 
-    @Override
-    public HashMap<String, Double> getInterestPath(String interest) {
-        return interestsFunction.getInterestPath(interest);
+    public ArrayList<Double> getWeights() {
+        return weights;
+    }
+
+    public WeightedFunction setWeights(ArrayList<Double> weights) {
+        this.weights = weights;
+        return this;
     }
 
     @Override
     public double eval(List<User> variableValue) {
-        return  w1 * groupSizeFunction.eval(variableValue) +
-                w2 * interestsFunction.eval(variableValue) +
-                w3 * levelFunction.eval(variableValue) +
-                w4 * participationStyleFunction.eval(variableValue);
+        double result = 0.0;
+        int i = 0;
+        for(Function function: functions){
+            result += weights.get(i) * function.eval(variableValue);
+            i++;
+        }
+
+        return result;
+    }
+
+    @Override
+    public HashMap<String, Double> getInterestPath(String interests) {
+        return interestsFunction.getInterestPath(interests);
     }
 }

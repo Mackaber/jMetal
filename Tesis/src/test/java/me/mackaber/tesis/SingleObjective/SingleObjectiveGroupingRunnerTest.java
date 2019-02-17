@@ -1,6 +1,6 @@
 package me.mackaber.tesis.SingleObjective;
 
-import me.mackaber.tesis.ObjectiveFunctions.WeightedFunction;
+import me.mackaber.tesis.ObjectiveFunctions.*;
 import me.mackaber.tesis.Util.GroupSwapMutation;
 import me.mackaber.tesis.Util.User;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
@@ -19,11 +19,11 @@ public class SingleObjectiveGroupingRunnerTest {
     public void Scratch() throws Exception {
         SingleObjectiveGrouping problem = new SingleObjectiveGrouping("res/synthetic_10001.csv");
 
-        WeightedFunction function = new WeightedFunction("res/custom_interests.json");
-        function.setW1(1.0); // Group Size
-        function.setW2(1.0); // Interests
-        function.setW3(1.0); // Level
-        function.setW4(1.0); // Participation Style
+        WeightedFunction function = new WeightedFunction();
+        function.addObjectiveFunction(1.0, new GroupSizeFunction())
+                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json"))
+                .addObjectiveFunction(1.0, new LevelFunction())
+                .addObjectiveFunction(1.0, new ParticipationStyleFunction());
 
         problem.setGroupSizeRange(3, 6)
                 .setObjectiveFunction(function)

@@ -77,35 +77,39 @@ public class GroupSwapMutation<T> implements MutationOperator<GroupingSolution<T
             throw new JMetalException("Null parameter");
         }
 
-        doMutation(solution);
+        doMutation((GroupingSolution<List<User>>) solution);
         return solution;
     }
 
     /**
      * Performs the operation
+     *
+     * @param solution
      */
-    public void doMutation(GroupingSolution<T> solution) {
+    public void doMutation(GroupingSolution<List<User>> solution) {
         int combinationLength;
         combinationLength = solution.getNumberOfVariables();
 
         if ((combinationLength != 0) && (combinationLength != 1)) { // No se si esto vaya o no XP
             if (mutationRandomGenerator.getRandomValue() < mutationProbability) {
-                List<User> group1 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
-                List<User> group2 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
+                GroupingSolution<List<User>> tmp_sol = (GroupingSolution<List<User>>) solution.copy();
 
-//                while (group1 == group2 | group1.size() == 0 | group2.size() == 0) {
-//                    while (group1.size() <= combinationProblem.getMinSize() + 1 | group1.size() == 0) {
-//                        group1 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
-//                    }
-//
-//                    while (group2.size() > combinationProblem.getMaxSize() - 1 | group2.size() == 0) {
-//                        group2 = (List<User>) solution.getVariableValue(positionRandomGenerator.getRandomValue(0, combinationLength - 1));
-//                    }
-//                }
-                if (group1.size() > 2 && group2.size() > 0) {
-                    User user = group1.get(positionRandomGenerator.getRandomValue(0, group1.size() - 1));
-                    group2.add(user);
-                    group1.remove(user);
+                int g1 = positionRandomGenerator.getRandomValue(0, combinationLength - 1);
+                int g2 = positionRandomGenerator.getRandomValue(0, combinationLength - 1);
+                int min_size = combinationProblem.getMinSize();
+                int max_size = combinationProblem.getMaxSize();
+
+                if (g1 != g2) {
+                    List<User> group1 = tmp_sol.getVariableValue(g1);
+                    List<User> group2 = tmp_sol.getVariableValue(g2);
+                    if((group1.size() >  min_size + 1) && (group2.size() > min_size) && (group2.size() < max_size + 1)) {
+                        User user = group1.get(0); // Maybe Random
+                        group1.remove(user);
+                        group2.add(user);
+
+                        solution.setVariableValue(g1, group1);
+                        solution.setVariableValue(g2, group2);
+                    }
                 }
             }
         }

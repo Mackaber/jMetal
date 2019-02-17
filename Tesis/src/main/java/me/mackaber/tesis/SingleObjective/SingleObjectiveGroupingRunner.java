@@ -22,11 +22,11 @@ public class SingleObjectiveGroupingRunner {
 
         SingleObjectiveGrouping problem = new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_200.csv");
 
-        WeightedFunction function = new WeightedFunction("Tesis/src/main/resources/custom_interests.json");
-        function.setW1(1.0); // Group Size
-        function.setW2(1.0); // Interests
-        function.setW3(1.0); // Level
-        function.setW4(1.0); // Participation Style
+        WeightedFunction function = new WeightedFunction();
+        function.addObjectiveFunction(1.0, new GroupSizeFunction())
+                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json"))
+                .addObjectiveFunction(1.0, new LevelFunction())
+                .addObjectiveFunction(1.0, new ParticipationStyleFunction());
 
         problem.setGroupSizeRange(3, 6)
                 .setObjectiveFunction(function)
