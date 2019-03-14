@@ -71,6 +71,13 @@ public class PISAHypervolume<S extends Solution<?>> extends Hypervolume<S> {
 
     return hypervolume(new ArrayFront(paretoFrontApproximation), referenceParetoFront);  }
 
+  public Double evaluate(Front paretoFrontApproximation) {
+    if (paretoFrontApproximation == null) {
+      throw new JMetalException("The pareto front approximation is null") ;
+    }
+
+    return hypervolume(paretoFrontApproximation, referenceParetoFront);  }
+
   /*
    returns true if 'point1' dominates 'points2' with respect to the
    to the first 'noObjectives' objectives

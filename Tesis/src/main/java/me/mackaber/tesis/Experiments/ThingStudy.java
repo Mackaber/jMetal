@@ -16,10 +16,13 @@ import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.SelectionOperator;
 import org.uma.jmetal.operator.impl.crossover.NPointCrossover;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
+import org.uma.jmetal.qualityindicator.impl.GenerationalDistance;
+import org.uma.jmetal.qualityindicator.impl.hypervolume.PISAHypervolume;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
 import org.uma.jmetal.util.evaluator.impl.MultithreadedSolutionListEvaluator;
 import org.uma.jmetal.util.experiment.Experiment;
 import org.uma.jmetal.util.experiment.ExperimentBuilder;
+import org.uma.jmetal.util.experiment.component.ComputeQualityIndicators;
 import org.uma.jmetal.util.experiment.component.ExecuteAlgorithms;
 import org.uma.jmetal.util.experiment.util.ExperimentAlgorithm;
 import org.uma.jmetal.util.experiment.util.ExperimentProblem;
@@ -27,12 +30,13 @@ import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class ThingStudy {
 
-    private static final int INDEPENDENT_RUNS = 200;
+    private static final int INDEPENDENT_RUNS = 20;
 
     public static void main(String[] args) throws IOException {
         JMetalRandom.getInstance().setSeed(120L);
@@ -42,7 +46,7 @@ public class ThingStudy {
         // Problem Definition
 
         problems.add(new MultiObjectiveGrouping("Tesis/src/main/resources/synthetic_20.csv"));
-        problems.add(new MultiObjectiveGrouping("Tesis/src/main/resources/synthetic_200.csv"));
+//        problems.add(new MultiObjectiveGrouping("Tesis/src/main/resources/synthetic_200.csv"));
 //        problems.add(new MultiObjectiveGrouping("Tesis/src/main/resources/synthetic_2000.csv"));
 //        problems.add(new MultiObjectiveGrouping("Tesis/src/main/resources/synthetic_10001.csv"));
 
@@ -73,9 +77,13 @@ public class ThingStudy {
                         .setReferenceFrontDirectory("/paretoFronts")
                         .setIndependentRuns(INDEPENDENT_RUNS)
                         .setNumberOfCores(5)
+                        .setIndicatorList(Arrays.asList(
+                                new PISAHypervolume<>(),
+                                new GenerationalDistance<>()))
                         .build();
 
         new ExecuteAlgorithms<>(experiment).run();
+        new ComputeQualityIndicators<>(experiment).run();
     }
 
 

@@ -2,7 +2,6 @@ package me.mackaber.tesis.MultiObjective;
 
 import me.mackaber.tesis.SingleObjective.DefaultGroupingSolution;
 import me.mackaber.tesis.SingleObjective.GroupingSolution;
-import me.mackaber.tesis.SingleObjective.SingleObjectiveGrouping;
 import me.mackaber.tesis.Util.CombinationProblem;
 import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.InterestsFunction;
@@ -12,6 +11,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.math3.stat.descriptive.AbstractStorelessUnivariateStatistic;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 
 import java.io.FileReader;
 import java.io.IOException;

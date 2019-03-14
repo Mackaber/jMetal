@@ -53,6 +53,17 @@
             <version>5.5.3-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jamesframework</groupId>
+            <artifactId>james-core</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <!-- SLF4J NOP: discard log messages -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.21</version>
+        </dependency>
     </dependencies>
 
 
