@@ -78,7 +78,7 @@ public class GroupSolution extends AbstractGenericSolution<Integer, CombinationP
         int groupId = 0;
         int j = 0;
         for (List<Integer> group : newSolution.groups.getInternalGroups()) {
-            if(group.size() < 6)
+            if (group.size() < 6)
                 newSolution.groups.addAvailableGroup(groupId);
             for (Integer user : group) {
                 newSolution.setAttributeWithoutChange(user, groupId);

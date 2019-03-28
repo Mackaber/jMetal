@@ -4,6 +4,7 @@ import me.mackaber.tesis.Util.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.math3.exception.NotANumberException;
 import org.apache.commons.math3.stat.descriptive.AbstractStorelessUnivariateStatistic;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 
@@ -71,7 +72,7 @@ public class GroupingProblem extends CombinationProblem {
         setName("Grouping_Problem_" + usersSize);
     }
 
-    public DefaultGroupSolution createHolder(DefaultGroupSolution solution) {
+    public DefaultGroupSolution createHolder(GroupSolution solution) {
         setNumberOfVariables(solution.getNumberOfVariables());
         setNumberOfObjectives(functions.size());
 
@@ -87,14 +88,16 @@ public class GroupingProblem extends CombinationProblem {
 
     @Override
     public void evaluate(GroupSolution solution) {
-        double fitness;
+        double fitness = 0;
         int j = 0;
 
         for (Function function : functions) {
             int n_groups = solution.getGroups().getInternalGroups().size();
             double[] results = new double[n_groups];
             for (int i = 0; i < n_groups - 1; i++) {
-                results[i] = (function.eval(solution.getGroups().getInternalGroups().get(i)));
+                List<Integer> group = solution.getGroups().getInternalGroups().get(i);
+                if (group.size() > 0)
+                    results[i] = (function.eval(group));
             }
 
             fitness = ct_measure.evaluate(results);

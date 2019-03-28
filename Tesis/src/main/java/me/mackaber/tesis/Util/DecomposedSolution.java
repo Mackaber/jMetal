@@ -14,11 +14,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DecomposedSolution<T> extends DefaultGroupSolution {
+public class DecomposedSolution<T> extends GroupSolution {
 
 
     public <Result> DecomposedSolution(Result solution) {
-        super((DefaultGroupSolution) solution);
+        super((GroupSolution) solution);
     }
 
     public List<GroupSolution> getPopulation() {
@@ -28,6 +28,7 @@ public class DecomposedSolution<T> extends DefaultGroupSolution {
         problemHolder.addObjectiveFunction(new GroupSizeFunction());
         problemHolder.addObjectiveFunction(new ParticipationStyleFunction());
         problemHolder.addObjectiveFunction(new LevelFunction());
+        problemHolder.addObjectiveFunction(new InterestsCosineSimilarityFunction());
 
         List<GroupSolution> population = new ArrayList<>(1);
         population.add(problemHolder.createHolder(this));

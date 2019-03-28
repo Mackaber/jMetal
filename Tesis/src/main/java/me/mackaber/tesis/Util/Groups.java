@@ -35,7 +35,13 @@ public class Groups {
 
     public Integer getRandomGroup() {
         RandomGenerator<Integer> generator = RandomGenerator.forCollection(indexSelector, availableGroups);
-        return generator.getRandomValue();
+        if (availableGroups.size() > 0)
+            return generator.getRandomValue();
+        else {
+            groups.add(new LinkedList<>());
+            // if There are no available groups, Generate a new group
+            return groups.size() - 1;
+        }
     }
 
     public void changeUserGroup(Integer userId, Integer originId, Integer destinyId) {
@@ -45,15 +51,15 @@ public class Groups {
 
         destiny.add(userId);
 
-        if (currentCount > 5)
-            availableGroups.remove(destinyId);
-
         if (originId != null) {
             List<Integer> origin = groups.get(originId);
             origin.remove(userId);
             if (!availableGroups.contains(originId))
                 availableGroups.add(originId);
         }
+
+        if (currentCount > 5)
+            availableGroups.remove(destinyId);
     }
 
     public LinkedList<List<Integer>> getInternalGroups() {
@@ -65,7 +71,7 @@ public class Groups {
         return this;
     }
 
-    public void addAvailableGroup(Integer groupId){
+    public void addAvailableGroup(Integer groupId) {
         availableGroups.add(groupId);
     }
 
@@ -81,5 +87,9 @@ public class Groups {
         List<List<Integer>> lists = new ArrayList<>(
                 group.stream().collect(Collectors.groupingBy(s -> group.indexOf(s) < midIndex)).values());
         groups.addAll(lists);
+    }
+
+    public List<Integer> getAvailableGroups() {
+        return availableGroups;
     }
 }

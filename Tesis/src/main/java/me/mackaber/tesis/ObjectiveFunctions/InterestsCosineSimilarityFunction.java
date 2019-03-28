@@ -50,7 +50,13 @@ public class InterestsCosineSimilarityFunction extends Function {
             }
         }
         Mean mean = new Mean();
-        double result = 1 - mean.evaluate(ArrayUtils.toPrimitive(evals.toArray(new Double[evals.size()])));
-        return result < 0 | result == Float.NaN ? 0.0 : result;
+        Double result = 1 - mean.evaluate(ArrayUtils.toPrimitive(evals.toArray(new Double[evals.size()])));
+
+        // TODO: Check why there still groups with 1 person!
+
+        if (result.isNaN())
+            return 1.0;
+        else
+            return result < 0 ? 0.0 : result;
     }
 }

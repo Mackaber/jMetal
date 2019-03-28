@@ -47,11 +47,11 @@ public class SingleObjectiveGroupingRunnerNew {
         problem.evaluate(solution);
         GroupSolution newSolution = localSearch.execute(solution);
 
-//        DecomposedSolution decomposedSolution = new DecomposedSolution(newSolution);
-//        new SolutionListOutput(decomposedSolution.getPopulation())
-//                .setSeparator("\t")
-//                .setFunFileOutputContext(new DefaultFileOutputContext("DEC0.tsv"))
-//                .print();
+        DecomposedSolution decomposedSolution = new DecomposedSolution(newSolution);
+        new SolutionListOutput(decomposedSolution.getPopulation())
+                .setSeparator("\t")
+                .setFunFileOutputContext(new DefaultFileOutputContext("DEC0.tsv"))
+                .print();
         System.out.println(solution.getObjective(0));
         System.out.println(newSolution.getObjective(0));
     }

@@ -4,6 +4,7 @@ import me.mackaber.tesis.SingleObjective.GroupingProblem;
 import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.InterestVector;
 import me.mackaber.tesis.Util.User;
+import org.apache.commons.math3.exception.NotANumberException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
