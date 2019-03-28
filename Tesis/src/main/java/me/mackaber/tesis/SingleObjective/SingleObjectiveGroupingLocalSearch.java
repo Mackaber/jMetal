@@ -19,7 +19,7 @@ public class SingleObjectiveGroupingLocalSearch {
 
         WeightedFunction function = new WeightedFunction();
         function.addObjectiveFunction(1.0, new GroupSizeFunction())
-                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json"))
+//                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json"))
                 .addObjectiveFunction(1.0, new LevelFunction())
                 .addObjectiveFunction(1.0, new ParticipationStyleFunction());
 
@@ -28,25 +28,25 @@ public class SingleObjectiveGroupingLocalSearch {
                 .setCentralTendencyMeasure(new Mean())
                 .build();
 
-        MutationOperator<GroupingSolution<List<User>>> mutationOperator =
-                new GroupSwapMutation<>(0.02, problem);
+//        MutationOperator<GroupingSolution<List<User>>> mutationOperator =
+//                new GroupSwapMutation<>(0.02, problem);
 
         int improvementRounds = 100;
 
         Comparator<GroupingSolution<List<User>>> comparator = new DominanceComparator<>(0);
 
-        LocalSearchOperator<GroupingSolution<List<User>>> localSearch = new BasicLocalSearch<>(
-                improvementRounds,
-                mutationOperator,
-                comparator,
-                problem);
+//        LocalSearchOperator<GroupingSolution<List<User>>> localSearch = new BasicLocalSearch<>(
+//                improvementRounds,
+//                mutationOperator,
+//                comparator,
+//                problem);
 
         GroupingSolution solution = problem.createSolution();
         problem.evaluate(solution);
-        GroupingSolution newSolution = localSearch.execute(solution);
+//        GroupingSolution newSolution = localSearch.execute(solution);
 
-        JMetalLogger.logger.info("Fitness: " + newSolution.getObjective(0));
-        JMetalLogger.logger.info("Solution: " + newSolution.getSampleSolution(3));
+//        JMetalLogger.logger.info("Fitness: " + newSolution.getObjective(0));
+//        JMetalLogger.logger.info("Solution: " + newSolution.getSampleSolution(3));
     }
 }
 

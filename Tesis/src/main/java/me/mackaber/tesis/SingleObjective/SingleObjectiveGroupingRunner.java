@@ -24,18 +24,18 @@ public class SingleObjectiveGroupingRunner {
 
         WeightedFunction function = new WeightedFunction();
         function.addObjectiveFunction(1.0, new GroupSizeFunction())
-                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json"))
+//                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json"))
                 .addObjectiveFunction(1.0, new LevelFunction())
                 .addObjectiveFunction(1.0, new ParticipationStyleFunction());
 
         problem.setGroupSizeRange(3, 6)
-                .setObjectiveFunction(function)
+                // .setObjectiveFunction(function)
                 .setCentralTendencyMeasure(new Mean())
                 .build();
 
         double mutationProbability = 1.0 / problem.getNumberOfVariables();
-        MutationOperator<GroupingSolution<List<User>>> mutationOperator =
-                new GroupSwapMutation<>(mutationProbability, problem);
+//        MutationOperator<GroupingSolution<List<User>>> mutationOperator =
+//                new GroupSwapMutation<>(mutationProbability, problem);
 
         int improvementRounds = 25000;
 
@@ -43,26 +43,26 @@ public class SingleObjectiveGroupingRunner {
 
         List<Double> improvement = new ArrayList<>();
 
-        LocalSearchOperator<GroupingSolution<List<User>>> localSearch = new CustomLocalSearch<>(
-                improvementRounds,
-                mutationOperator,
-                comparator,
-                problem,
-                improvement::add);
+//        LocalSearchOperator<GroupingSolution<List<User>>> localSearch = new CustomLocalSearch<>(
+//                improvementRounds,
+//                mutationOperator,
+//                comparator,
+//                problem,
+//                improvement::add);
 
         GroupingSolution solution = problem.createSolution();
-        problem.evaluate(solution);
-        GroupingSolution newSolution = localSearch.execute(solution);
+        //problem.evaluate(solution);
+//        GroupingSolution newSolution = localSearch.execute(solution);
 
 
-        JMetalLogger.logger.info("Improvement: " + improvement);
-        JMetalLogger.logger.info("Fitness: " + newSolution.getObjective(0)) ;
-        JMetalLogger.logger.info("Group Size: " + newSolution.evaluate(new GroupSizeFunction()));
-        JMetalLogger.logger.info("Interests: " + newSolution.evaluate(new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json")));
-        JMetalLogger.logger.info("Level: " + newSolution.evaluate(new LevelFunction()));
-        JMetalLogger.logger.info("Participation Style: " + newSolution.evaluate(new ParticipationStyleFunction()));
-
-        JMetalLogger.logger.info("Solution: " + newSolution.getSampleSolution(3)) ;
-        System.out.print(solution.getObjective(0));
+//        JMetalLogger.logger.info("Improvement: " + improvement);
+//        JMetalLogger.logger.info("Fitness: " + newSolution.getObjective(0)) ;
+//        JMetalLogger.logger.info("Groups Size: " + newSolution.evaluate(new GroupSizeFunction()));
+//        JMetalLogger.logger.info("Interests: " + newSolution.evaluate(new InterestsCosineSimilarityFunction("Tesis/src/main/resources/custom_interests.json")));
+//        JMetalLogger.logger.info("Level: " + newSolution.evaluate(new LevelFunction()));
+//        JMetalLogger.logger.info("Participation Style: " + newSolution.evaluate(new ParticipationStyleFunction()));
+//
+//        JMetalLogger.logger.info("Solution: " + newSolution.getSampleSolution(3)) ;
+//        System.out.print(solution.getObjective(0));
     }
 }

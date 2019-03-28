@@ -6,14 +6,14 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import java.util.List;
 
-public class LevelFunction implements Function {
+public class LevelFunction extends Function {
     @Override
-    public double eval(List<User> variableValue) {
-        int numberOfUsers = variableValue.size();
+    public double eval(List<Integer> group) {
+        int numberOfUsers = group.size();
         double[] levels = new double[numberOfUsers];
 
-        for(int i=0;i<numberOfUsers;i++) {
-            levels[i] =  Double.valueOf(variableValue.get(i).getLevel());
+        for (int i = 0; i < numberOfUsers - 1; i++) {
+            levels[i] = Double.valueOf(getProblem().getUsers().get(i).getLevel());
         }
 
         StandardDeviation sd = new StandardDeviation();

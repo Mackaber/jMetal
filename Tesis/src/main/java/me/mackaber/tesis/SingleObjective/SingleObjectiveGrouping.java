@@ -1,6 +1,6 @@
 package me.mackaber.tesis.SingleObjective;
 
-import me.mackaber.tesis.Util.InterestsFunction;
+import me.mackaber.tesis.Util.InterestVector;
 import me.mackaber.tesis.Util.CombinationProblem;
 import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.User;
@@ -9,7 +9,6 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.math3.stat.descriptive.AbstractStorelessUnivariateStatistic;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -53,22 +52,22 @@ public class SingleObjectiveGrouping extends CombinationProblem {
         setName("SingleObjectiveGrouping");
     }
 
-    @Override
+//    @Override
     public void evaluate(GroupingSolution<List<User>> solution) {
         double fitness1;
 
-        double[] results = new double[getNumberOfVariables()];
-        for (int i = 0; i < solution.getNumberOfVariables(); i++) {
-            if (solution.getVariableValue(i).size() > 0) // The solution may contain empty groups as variables
-                results[i] = (function.eval(solution.getVariableValue(i)));
-            else {
-                results = Arrays.copyOfRange(results, 0, i);
-                break;
-            }
-        }
+//        double[] results = new double[getNumberOfVariables()];
+//        for (int i = 0; i < solution.getNumberOfVariables(); i++) {
+//            if (solution.getVariableValue(i).size() > 0) // The solution may contain empty groups as variables
+//                results[i] = (function.eval(solution.getVariableValue(i)));
+//            else {
+//                results = Arrays.copyOfRange(results, 0, i);
+//                break;
+//            }
+//        }
 
-        fitness1 = ct_measure.evaluate(results);
-        solution.setObjective(0, fitness1);
+        //fitness1 = ct_measure.evaluate(results);
+        //solution.setObjective(0, fitness1);
     }
 
     @Override
@@ -76,11 +75,21 @@ public class SingleObjectiveGrouping extends CombinationProblem {
         return "SingleObjectiveGrouping_" + usersSize;
     }
 
+    @Override
+    public void evaluate(GroupSolution solution) {
+
+    }
 
     @Override
-    public GroupingSolution<List<User>> createSolution() {
-        return new DefaultGroupingSolution(this);
+    public GroupSolution createSolution() {
+        return null;
     }
+
+
+    //@Override
+    //public GroupingSolution<List<User>> createSolution() {
+//        return new DefaultGroupingSolution(this);
+//    }
 
     @Override
     public List<User> getUsers() {
@@ -109,13 +118,14 @@ public class SingleObjectiveGrouping extends CombinationProblem {
                     .setInterests(interests)
                     .setPart_prc(Double.parseDouble(record.get(5)))
                     .setPart_time(Double.parseDouble(record.get(6)));
-            if (function instanceof InterestsFunction) {
-                InterestsFunction interestsFunction = (InterestsFunction) function;
-                user.setInterestVector(interestsFunction.getInterestVector(interests));
-            }
-            problem_users.add(user);
-        }
-        usersSize = problem_users.size();
-        return problem_users;
+//            if (function instanceof InterestVector) {
+//                InterestVector interestsFunction = (InterestVector) function;
+                //user.setInterestVector(interestsFunction.getInterestVector(interests));
+//            }
+//            problem_users.add(user);
+//        }
+//        usersSize = problem_users.size();
+//        return problem_users;
     }
+    return null;}
 }

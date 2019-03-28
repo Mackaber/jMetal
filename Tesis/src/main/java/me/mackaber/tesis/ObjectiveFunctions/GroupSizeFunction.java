@@ -6,9 +6,11 @@ import org.apache.commons.math3.stat.descriptive.summary.Sum;
 
 import java.util.List;
 
-public class GroupSizeFunction implements Function {
+public class GroupSizeFunction extends Function {
+
     @Override
-    public double eval(List<User> variableValue) {
-        return Math.abs(variableValue.size() - 4.5);
+    public double eval(List<Integer> group) {
+        double eval = Math.abs(group.size() - 4.5);
+        return eval;
     }
 }

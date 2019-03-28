@@ -1,49 +1,16 @@
 package me.mackaber.tesis.ObjectiveFunctions;
 
-import me.mackaber.tesis.Util.InterestsFunction;
+import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.User;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
-import com.google.gson.*;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.Float.NaN;
-
-public class InterestsCosineSimilarityFunction extends InterestsFunction {
-    private final String interestTreeFile;
-    private final HashMap<String, HashMap<String, Double>> interestsTree = new HashMap<>();
-
-    public InterestsCosineSimilarityFunction(String interestTreeFile) throws FileNotFoundException {
-        this.interestTreeFile = interestTreeFile;
-        buildInterestTree();
-    }
-
-    private void buildInterestTree() throws FileNotFoundException {
-        JsonParser parser = new JsonParser();
-        FileReader reader = new FileReader(interestTreeFile);
-        JsonElement interestsJson = parser.parse(reader);
-
-        JsonArray interests = interestsJson.getAsJsonArray();
-        for (JsonElement entry : interests) {
-            JsonObject interest = (JsonObject) entry;
-            JsonArray path = interest.get("path").getAsJsonArray();
-
-            HashMap<String, Double> path_values = new HashMap<>();
-            Double i = (double) path.size();
-            for (JsonElement element : path.getAsJsonArray()) {
-                path_values.put(element.getAsString(), i);
-                i--;
-            }
-            path_values.put(interest.get("raw_name").getAsString(), 0.0);
-            interestsTree.put(interest.get("raw_name").getAsString(), path_values);
-        }
-    }
+public class InterestsCosineSimilarityFunction extends Function {
 
     private static Double cosineSimilarity(HashMap<String, Double> vector1, HashMap<String, Double> vector2) {
         // Merge Vectors before comparing...
@@ -62,7 +29,6 @@ public class InterestsCosineSimilarityFunction extends InterestsFunction {
             sumSqrt2 += interest.getValue() * interest.getValue();
         }
 
-
         double sumProduct = 0.0;
         for (Map.Entry<String, Double> interest : vector1.entrySet()) {
             sumProduct += interest.getValue() * vector2.get(interest.getKey());
@@ -73,23 +39,18 @@ public class InterestsCosineSimilarityFunction extends InterestsFunction {
 
 
     @Override
-    public double eval(List<User> variableValue) {
+    public double eval(List<Integer> group) {
         List<Double> evals = new ArrayList<>();
-        for (int i = 0; i < variableValue.size() - 1; i++) {
-            for (int j = i + 1; j < variableValue.size(); j++) {
-                HashMap<String, Double> vect1 = (HashMap<String, Double>) variableValue.get(i).getInterestVector().clone();
-                HashMap<String, Double> vect2 = (HashMap<String, Double>) variableValue.get(j).getInterestVector().clone();
+        for (int i = 0; i < group.size() - 1; i++) {
+            for (int j = i + 1; j < group.size(); j++) {
+                HashMap<String, Double> vect1 = (HashMap<String, Double>) getProblem().getUsers().get(i).getInterestVector().clone();
+                HashMap<String, Double> vect2 = (HashMap<String, Double>) getProblem().getUsers().get(j).getInterestVector().clone();
 
-                evals.add(cosineSimilarity(vect1,vect2));
+                evals.add(cosineSimilarity(vect1, vect2));
             }
         }
         Mean mean = new Mean();
         double result = 1 - mean.evaluate(ArrayUtils.toPrimitive(evals.toArray(new Double[evals.size()])));
-        return result < 0 ? 0.0 : result;
-    }
-
-    @Override
-    public HashMap<String, Double> getInterestPath(String interest) {
-        return interestsTree.get(interest);
+        return result < 0 | result == Float.NaN ? 0.0 : result;
     }
 }

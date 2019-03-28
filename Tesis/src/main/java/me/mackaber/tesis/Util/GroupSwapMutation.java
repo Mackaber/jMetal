@@ -1,15 +1,13 @@
 package me.mackaber.tesis.Util;
 
 import me.mackaber.tesis.SingleObjective.GroupSolution;
+import me.mackaber.tesis.SingleObjective.GroupingProblem;
 import me.mackaber.tesis.SingleObjective.GroupingSolution;
 import org.uma.jmetal.operator.MutationOperator;
-import org.uma.jmetal.solution.PermutationSolution;
 import org.uma.jmetal.util.JMetalException;
 import org.uma.jmetal.util.pseudorandom.BoundedRandomGenerator;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 import org.uma.jmetal.util.pseudorandom.RandomGenerator;
-
-import java.util.List;
 
 /**
  * This class implements a swap mutation. The solution type of the solution
@@ -19,7 +17,7 @@ import java.util.List;
  * @author Juan J. Durillo
  */
 @SuppressWarnings("serial")
-public class GroupSwapMutation<T> implements MutationOperator<GroupingSolution<T>> {
+public class GroupSwapMutation implements MutationOperator<GroupSolution> {
     private double mutationProbability;
     private RandomGenerator<Double> mutationRandomGenerator;
     private BoundedRandomGenerator<Integer> positionRandomGenerator;
@@ -72,12 +70,12 @@ public class GroupSwapMutation<T> implements MutationOperator<GroupingSolution<T
 
     /* Execute() method */
     @Override
-    public GroupingSolution<T> execute(GroupingSolution<T> solution) {
+    public GroupSolution execute(GroupSolution solution) {
         if (null == solution) {
             throw new JMetalException("Null parameter");
         }
 
-        doMutation((GroupingSolution<List<User>>) solution);
+        doMutation(solution);
         return solution;
     }
 
@@ -86,40 +84,16 @@ public class GroupSwapMutation<T> implements MutationOperator<GroupingSolution<T
      *
      * @param solution
      */
-    public void doMutation(GroupingSolution<List<User>> solution) {
+    public void doMutation(GroupSolution solution) {
         int combinationLength;
         combinationLength = solution.getNumberOfVariables();
 
-        boolean mutated = false;
-
-        while (!mutated) {
-            if ((combinationLength != 0) && (combinationLength != 1)) { // No se si esto vaya o no XP
-                if (mutationRandomGenerator.getRandomValue() < mutationProbability) {
-                    GroupingSolution<List<User>> tmp_sol = (GroupingSolution<List<User>>) solution.copy();
-
-                    int g1 = positionRandomGenerator.getRandomValue(0, combinationLength - 1);
-                    int g2 = positionRandomGenerator.getRandomValue(0, combinationLength - 1);
-                    int min_size = combinationProblem.getMinSize();
-                    int max_size = combinationProblem.getMaxSize();
-
-                    if (g1 != g2) {
-                        List<User> group1 = tmp_sol.getVariableValue(g1);
-                        List<User> group2 = tmp_sol.getVariableValue(g2);
-                        if ((group1.size() >= min_size + 1) && (group2.size() >= min_size) && (group2.size() <= max_size + 1)) {
-//                            if ((group1.size() > 0) && (group2.size() > 0)) {
-                            User user = group1.get(0); // Maybe Random
-                            group1.remove(user);
-                            group2.add(user);
-
-                            solution.setVariableValue(g1, group1);
-                            solution.setVariableValue(g2, group2);
-                            mutated = true;
-                        }
-                    }
-                }
+        if ((combinationLength != 0) && (combinationLength != 1)) {
+            if (mutationRandomGenerator.getRandomValue() < mutationProbability) {
+                int pos = positionRandomGenerator.getRandomValue(0, combinationLength - 1);
+                solution.setVariableValue(pos,solution.getGroups().getRandomGroup());
             }
         }
     }
 }
-//}
 

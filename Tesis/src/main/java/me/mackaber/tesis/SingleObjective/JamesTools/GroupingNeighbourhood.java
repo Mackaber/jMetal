@@ -1,6 +1,5 @@
 package me.mackaber.tesis.SingleObjective.JamesTools;
 
-import me.mackaber.tesis.SingleObjective.DefaultGroupingSolution;
 import me.mackaber.tesis.SingleObjective.GroupingSolution;
 import me.mackaber.tesis.Util.User;
 import org.jamesframework.core.search.neigh.Neighbourhood;
