@@ -62,7 +62,7 @@ public class PISAHypervolume<S extends Solution<?>> extends Hypervolume<S> {
   /**
    * Evaluate() method
    * @param paretoFrontApproximation
-   * @return
+   * @return = hypervolume.evaluate(
    */
   @Override public Double evaluate(List<S> paretoFrontApproximation) {
     if (paretoFrontApproximation == null) {

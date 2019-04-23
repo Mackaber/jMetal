@@ -79,7 +79,7 @@ public class GroupingProblem extends CombinationProblem {
         DefaultGroupSolution holder = new DefaultGroupSolution(this);
 
         for (int i = 0; i < solution.getNumberOfVariables(); i++) {
-            holder.setVariableValue(i, solution.getVariableValue(i));
+            holder.setAttributeWithoutChange(i, solution.getVariableValue(i));
         }
 
         evaluate(holder);

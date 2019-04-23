@@ -1,5 +1,6 @@
 package me.mackaber.tesis.Util;
 
+import me.mackaber.tesis.SingleObjective.GroupSolution;
 import me.mackaber.tesis.SingleObjective.GroupingSolution;
 import me.mackaber.tesis.SingleObjective.SingleObjectiveGrouping;
 import org.apache.commons.math3.analysis.function.Sin;
@@ -19,7 +20,7 @@ import java.util.List;
  * @author Juan J. Durillo
  */
 @SuppressWarnings("serial")
-public class GroupRandomMutation<T> implements MutationOperator<GroupingSolution<T>> {
+public class GroupRandomMutation<T> implements MutationOperator<GroupSolution> {
     private double mutationProbability;
     private RandomGenerator<Double> mutationRandomGenerator;
     private BoundedRandomGenerator<Integer> positionRandomGenerator;
@@ -72,12 +73,12 @@ public class GroupRandomMutation<T> implements MutationOperator<GroupingSolution
 
     /* Execute() method */
     @Override
-    public GroupingSolution<T> execute(GroupingSolution<T> solution) {
+    public GroupSolution execute(GroupSolution solution) {
         if (null == solution) {
             throw new JMetalException("Null parameter");
         }
 
-        doMutation((GroupingSolution<List<User>>) solution);
+        doMutation(solution);
         return solution;
     }
 
@@ -86,9 +87,8 @@ public class GroupRandomMutation<T> implements MutationOperator<GroupingSolution
      *
      * @param solution
      */
-    public void doMutation(GroupingSolution<List<User>> solution) {
-        GroupingSolution new_sol = combinationProblem.createSolution();
-        solution.setVariableValue(0, (List<User>) new_sol.getVariableValue(0));
+    public void doMutation(GroupSolution solution) {
+        solution.setVariableValue(0,solution.getGroups().getRandomGroup());
     }
 }
 

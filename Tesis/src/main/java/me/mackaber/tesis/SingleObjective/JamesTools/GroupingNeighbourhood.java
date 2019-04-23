@@ -1,5 +1,6 @@
 package me.mackaber.tesis.SingleObjective.JamesTools;
 
+import me.mackaber.tesis.SingleObjective.GroupSolution;
 import me.mackaber.tesis.SingleObjective.GroupingSolution;
 import me.mackaber.tesis.Util.User;
 import org.jamesframework.core.search.neigh.Neighbourhood;
@@ -27,20 +28,17 @@ public class GroupingNeighbourhood<S extends Solution> implements Neighbourhood<
     @Override
     public List<GroupingMove<S>> getAllMoves(GroupSolutionJames<S> solution) {
         List<GroupingMove<S>> moves = new ArrayList<>();
-        GroupingSolution<List<User>> jMetalSolution = (GroupingSolution<List<User>>) solution.getjMetalSolution();
+
+        GroupSolution jMetalSolution = (GroupSolution) solution.getjMetalSolution();
+        List<Integer> availableGroups = jMetalSolution.getGroups().getAvailableGroups();
 
         for (int i = 0; i < jMetalSolution.getNumberOfVariables() - 1; i++) {
-            for (int j = 0; j < jMetalSolution.getVariableValue(i).size() - 2; j++) {
-                GroupingSolution<List<User>> newSol = (GroupingSolution<List<User>>) jMetalSolution.copy();
-
-                User user = newSol.getVariableValue(i).get(j);
-                newSol.getVariableValue(i).remove(user);
-                newSol.getVariableValue(i + 1).add(user);
+            for(Integer group: availableGroups) {
+                GroupSolution newSol = (GroupSolution) jMetalSolution.copy();
+                newSol.setVariableValue(i,group);
 
                 GroupingMove groupingMove = new GroupingMove<>(newSol);
                 moves.add(groupingMove);
-
-
             }
         }
         return moves;

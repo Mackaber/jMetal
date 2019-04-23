@@ -2,33 +2,28 @@ package me.mackaber.tesis.Experiments;
 
 import me.mackaber.tesis.ObjectiveFunctions.*;
 import me.mackaber.tesis.SingleObjective.Algorithms.JamesParallelTempering;
-import me.mackaber.tesis.SingleObjective.Algorithms.LocalSearch;
 import me.mackaber.tesis.SingleObjective.Algorithms.JamesRandomDescent;
+import me.mackaber.tesis.SingleObjective.Algorithms.LocalSearch;
 import me.mackaber.tesis.SingleObjective.GroupSolution;
 import me.mackaber.tesis.SingleObjective.GroupingProblem;
-import me.mackaber.tesis.SingleObjective.GroupingSolution;
 import me.mackaber.tesis.SingleObjective.JamesTools.JamesAlgorithm;
-import me.mackaber.tesis.SingleObjective.SingleObjectiveGrouping;
 import me.mackaber.tesis.Util.*;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.jamesframework.core.search.stopcriteria.MaxSteps;
-import org.jamesframework.core.search.stopcriteria.MaxStepsWithoutImprovement;
 import org.uma.jmetal.algorithm.Algorithm;
-import org.uma.jmetal.algorithm.singleobjective.coralreefsoptimization.CoralReefsOptimizationBuilder;
+import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAIIBuilder;
 import org.uma.jmetal.algorithm.singleobjective.evolutionstrategy.EvolutionStrategyBuilder;
 import org.uma.jmetal.algorithm.singleobjective.geneticalgorithm.GeneticAlgorithmBuilder;
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.SelectionOperator;
-import org.uma.jmetal.operator.impl.crossover.NPointCrossover;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
 import org.uma.jmetal.qualityindicator.impl.*;
-import org.uma.jmetal.qualityindicator.impl.hypervolume.PISAHypervolume;
 import org.uma.jmetal.util.comparator.DominanceComparator;
-import org.uma.jmetal.util.comparator.ObjectiveComparator;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
 import org.uma.jmetal.util.evaluator.impl.MultithreadedSolutionListEvaluator;
 import org.uma.jmetal.util.experiment.Experiment;
 import org.uma.jmetal.util.experiment.ExperimentBuilder;
+import org.uma.jmetal.util.experiment.component.ComputeQualityIndicators;
 import org.uma.jmetal.util.experiment.component.ExecuteAlgorithms;
 import org.uma.jmetal.util.experiment.util.ExperimentAlgorithm;
 import org.uma.jmetal.util.experiment.util.ExperimentProblem;
@@ -49,7 +44,7 @@ public class SingleObjectiveStudy {
         // Problem Definition
 
         problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_20.csv"));
-        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_200.csv"));
+//        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_200.csv"));
 //        problems.add(new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_2000.csv"));
 //        problems.add(new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_10001.csv"));
 
@@ -77,22 +72,26 @@ public class SingleObjectiveStudy {
                 configureAlgorithmList(problemList);
 
         Experiment<GroupSolution, List<GroupSolution>> experiment =
-                new ExperimentBuilder<GroupSolution, List<GroupSolution>>("Thing Study")
+                new ExperimentBuilder<GroupSolution, List<GroupSolution>>("COSO")
                         .setAlgorithmList(algorithmList)
                         .setProblemList(problemList)
                         .setExperimentBaseDirectory(".")
-                        .setOutputParetoFrontFileName("FUN")
+                        .setOutputParetoFrontFileName("DEC")
                         .setOutputParetoSetFileName("VAR")
                         .setReferenceFrontDirectory("Tesis/src/main/resources/paretoFronts")
                         .setIndependentRuns(INDEPENDENT_RUNS)
                         .setNumberOfCores(5)
                         .setIndicatorList(Arrays.asList(
-                                new PISAHypervolume<>(),
-                                new GenerationalDistance<>()))
-                        .build();
+                                new Epsilon<>(),
+                                new Spread<>(),
+                                new GenerationalDistance<>(),
+                                new InvertedGenerationalDistance<>(),
+                                new InvertedGenerationalDistancePlus<>()
+                                )
+                        ).build();
 
         new ExecuteAlgorithms<>(experiment).run();
-        // new ComputeQualityIndicators<>(experiment).run();
+        new ComputeQualityIndicators<>(experiment).run();
     }
 
 
@@ -114,7 +113,9 @@ public class SingleObjectiveStudy {
             for (int i = 0; i < problemList.size(); i++) {
 
                 // Parameters and stuff
-                NPointCrossover crossover = new CombinationNPointCrossover(0.9, problemList.get(i).getProblem().getNumberOfVariables());
+                //CombinationNPointCrossover crossover = new CombinationNPointCrossover(0.9, problemList.get(i).getProblem().getNumberOfVariables());
+                CombinationNPointCrossoverWithoutRepair crossover = new CombinationNPointCrossoverWithoutRepair(0.9, problemList.get(i).getProblem().getNumberOfVariables());
+
 
                 double mutationProbability = 1.0 / problemList.get(i).getProblem().getNumberOfVariables();
                 MutationOperator<GroupSolution> mutation = new GroupSwapMutation(mutationProbability, (CombinationProblem) problemList.get(i).getProblem());
@@ -157,23 +158,6 @@ public class SingleObjectiveStudy {
                         .setMaxEvaluations(genNum * popSize)
                         .build();
 
-                Algorithm<GroupSolution> coral = new CoralReefsOptimizationBuilder<>(
-                        problemList.get(i).getProblem(),
-                        selection,
-                        crossover,
-                        mutation)
-                        .setM(10)
-                        .setN(10)
-                        .setRho(0.6)
-                        .setFbs(0.9)
-                        .setFbr(0.1)
-                        .setFa(0.1)
-                        .setPd(0.1)
-                        .setAttemptsToSettle(3)
-                        .setComparator(new ObjectiveComparator<>(0))
-                        .setMaxEvaluations(genNum * popSize)
-                        .build();
-
                 // Local Search
                 Comparator<GroupSolution> comparator = new DominanceComparator<>(0);
 
@@ -186,12 +170,26 @@ public class SingleObjectiveStudy {
                 JamesAlgorithm<GroupSolution> random_descent = new JamesRandomDescent<>(
                         problemList.get(i).getProblem(),
                         mutation);
-                random_descent.getJamesAlgorithm().addStopCriterion(new MaxStepsWithoutImprovement(100));
+                random_descent.getJamesAlgorithm().addStopCriterion(new MaxSteps(20));
 
                 JamesAlgorithm<GroupSolution> parallel_tempering = new JamesParallelTempering<>(
                         problemList.get(i).getProblem(),
                         mutation);
-                parallel_tempering.getJamesAlgorithm().addStopCriterion(new MaxSteps(5));
+                parallel_tempering.getJamesAlgorithm().addStopCriterion(new MaxSteps(20));
+
+
+                // ----------- MULTIOBJECTIVE --------------
+
+
+                Algorithm<List<GroupSolution>> nsgaii = new NSGAIIBuilder<>(
+                        problemList.get(i).getProblem(),
+                        crossover,
+                        mutation)
+                        .setSelectionOperator(selection)
+                        .setPopulationSize(popSize)
+                        .setMaxEvaluations(genNum * popSize)
+                        .setSolutionListEvaluator(new MultithreadedSolutionListEvaluator<>(10, problemList.get(i).getProblem()))
+                        .build();
 
 
                 algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_steady, "Genetic_Steady_" + tag, problemList.get(i), run));
@@ -199,9 +197,9 @@ public class SingleObjectiveStudy {
                 algorithms.add(new SingleObjectiveExperimentAlgorithm<>(elitist, "Elitist_" + tag, problemList.get(i), run));
                 algorithms.add(new SingleObjectiveExperimentAlgorithm<>(non_elitist, "NON_ELITIST_" + tag, problemList.get(i), run));
                 algorithms.add(new SingleObjectiveExperimentAlgorithm<>(localSearch, "Local_Search_" + tag, problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_descent, "Random_Descend_" + tag, problemList.get(i), run));
-//                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(parallel_tempering, "Parallel_Tempering_" + tag, problemList.get(i), run));
-                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(coral, "Coral_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_descent, "Random_Descend_" + tag, problemList.get(i), run));
+                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(parallel_tempering, "Parallel_Tempering_" + tag, problemList.get(i), run));
+                //algorithms.add(new ExperimentAlgorithm<>(nsgaii, "Random_Descend_" + tag, problemList.get(i), run));
 
             }
         }

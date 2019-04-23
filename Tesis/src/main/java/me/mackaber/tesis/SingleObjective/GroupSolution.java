@@ -36,10 +36,20 @@ public class GroupSolution extends AbstractGenericSolution<Integer, CombinationP
         }
 
         for (int i = 0; i < problem.getNumberOfVariables(); i++) {
-            setVariableValue(i, solution.getVariableValue(i));
+            setAttributeWithoutChange(i, solution.getVariableValue(i));
         }
 
         attributes = new HashMap<>(solution.attributes);
+    }
+
+    public static boolean checkSolution(List<GroupSolution> s) {
+        for (GroupSolution solution : s) {
+            for (List<Integer> group : solution.getGroups().getInternalGroups()) {
+                if (group.size() < 3 || group.size() > 6)
+                    return false;
+            }
+        }
+        return true;
     }
 
     public Groups getGroups() {
@@ -130,7 +140,7 @@ public class GroupSolution extends AbstractGenericSolution<Integer, CombinationP
         super.setVariableValue(index, value);
     }
 
-    private void setAttributeWithoutChange(Integer user, int i) {
+    public void setAttributeWithoutChange(Integer user, int i) {
         super.setVariableValue(user, i);
     }
 }
