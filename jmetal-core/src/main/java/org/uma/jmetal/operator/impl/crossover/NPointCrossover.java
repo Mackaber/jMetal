@@ -45,6 +45,7 @@ public class NPointCrossover<T> implements CrossoverOperator<Solution<T>> {
     }
   }
 
+
   private List<Solution<T>> doCrossover(List<Solution<T>> s) {
     Solution<T> mom = s.get(0);
     Solution<T> dad = s.get(1);
