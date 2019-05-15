@@ -30,6 +30,7 @@ public class JamesSteepestDescent<S extends Solution<?>> extends JamesAlgorithm<
 
     @Override
     public S getResult() {
+        steepestDescent.dispose();
         return steepestDescent.getBestSolution().getjMetalSolution();
     }
 

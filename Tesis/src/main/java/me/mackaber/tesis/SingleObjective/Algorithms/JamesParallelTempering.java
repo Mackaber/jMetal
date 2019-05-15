@@ -17,15 +17,10 @@ public class JamesParallelTempering<S extends Solution<?>> extends JamesAlgorith
     private Problem<S> problem;
     private LocalSearch<GroupSolutionJames<S>> parallelTempering;
 
-    public JamesParallelTempering(Problem<S> groupingProblem, MutationOperator mutation) {
+    public JamesParallelTempering(Problem<S> groupingProblem, MutationOperator mutation,double minTemp, double maxTemp, int numReplicas) {
         this.problem = groupingProblem;
         this.mutation = mutation;
         GroupProblemJames<S> groupProblemJames = new GroupProblemJames<>(problem, mutation);
-
-        double minTemp = 1 * 1e-8;
-        double maxTemp = 1 * 0.6;
-        int numReplicas = 100;
-
         this.parallelTempering = new ParallelTempering<>(groupProblemJames, groupProblemJames.getNeighbourhood(), numReplicas, minTemp, maxTemp);
     }
 
@@ -36,6 +31,7 @@ public class JamesParallelTempering<S extends Solution<?>> extends JamesAlgorith
 
     @Override
     public S getResult() {
+        parallelTempering.dispose();
         return parallelTempering.getBestSolution().getjMetalSolution();
     }
 

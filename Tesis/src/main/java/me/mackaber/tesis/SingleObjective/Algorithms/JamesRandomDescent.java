@@ -36,6 +36,7 @@ public class JamesRandomDescent<S extends Solution<?>> extends JamesAlgorithm<S>
 
     @Override
     public S getResult() {
+        randomDescent.dispose();
         return randomDescent.getBestSolution().getjMetalSolution();
     }
 

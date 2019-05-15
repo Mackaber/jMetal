@@ -1,9 +1,7 @@
 package me.mackaber.tesis.Experiments;
 
 import me.mackaber.tesis.ObjectiveFunctions.*;
-import me.mackaber.tesis.SingleObjective.Algorithms.JamesParallelTempering;
-import me.mackaber.tesis.SingleObjective.Algorithms.JamesRandomDescent;
-import me.mackaber.tesis.SingleObjective.Algorithms.LocalSearch;
+import me.mackaber.tesis.SingleObjective.Algorithms.*;
 import me.mackaber.tesis.SingleObjective.GroupSolution;
 import me.mackaber.tesis.SingleObjective.GroupingProblem;
 import me.mackaber.tesis.SingleObjective.JamesTools.JamesAlgorithm;
@@ -43,10 +41,10 @@ public class SingleObjectiveStudy {
 
         // Problem Definition
 
-        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_20.csv"));
-//        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_200.csv"));
-//        problems.add(new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_2000.csv"));
-//        problems.add(new SingleObjectiveGrouping("Tesis/src/main/resources/synthetic_10001.csv"));
+        //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_20.csv"));
+        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_200.csv"));
+        //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_2000.csv"));
+        //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_10001.csv"));
 
         List<ExperimentProblem<GroupSolution>> problemList = new ArrayList<>();
 
@@ -166,16 +164,32 @@ public class SingleObjectiveStudy {
                         comparator,
                         problemList.get(i).getProblem());
 
-
                 JamesAlgorithm<GroupSolution> random_descent = new JamesRandomDescent<>(
                         problemList.get(i).getProblem(),
                         mutation);
                 random_descent.getJamesAlgorithm().addStopCriterion(new MaxSteps(20));
 
+                double minTemp = 1 * 1e-8;
+                double maxTemp = 1 * 0.6;
+                int numReplicas = 2;
+
                 JamesAlgorithm<GroupSolution> parallel_tempering = new JamesParallelTempering<>(
                         problemList.get(i).getProblem(),
+                        mutation,minTemp,maxTemp,numReplicas);
+                parallel_tempering.getJamesAlgorithm().addStopCriterion(new MaxSteps(200));
+
+                int memorySize = 200;
+
+                JamesAlgorithm<GroupSolution> tabu_search = new JamesTabuSearch<>(
+                        problemList.get(i).getProblem(),
+                        mutation, memorySize);
+                tabu_search.getJamesAlgorithm().addStopCriterion(new MaxSteps(200));
+
+                JamesAlgorithm<GroupSolution> random_search = new JamesRandomSearch<>(
+                        problemList.get(i).getProblem(),
                         mutation);
-                parallel_tempering.getJamesAlgorithm().addStopCriterion(new MaxSteps(20));
+                random_search.getJamesAlgorithm().addStopCriterion(new MaxSteps(200));
+
 
 
                 // ----------- MULTIOBJECTIVE --------------
@@ -188,19 +202,20 @@ public class SingleObjectiveStudy {
                         .setSelectionOperator(selection)
                         .setPopulationSize(popSize)
                         .setMaxEvaluations(genNum * popSize)
-                        .setSolutionListEvaluator(new MultithreadedSolutionListEvaluator<>(10, problemList.get(i).getProblem()))
+                        .setSolutionListEvaluator(new MultithreadedSolutionListEvaluator<>(4, problemList.get(i).getProblem()))
                         .build();
 
 
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_steady, "Genetic_Steady_" + tag, problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_generational, "Genetic_Generational_" + tag, problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(elitist, "Elitist_" + tag, problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(non_elitist, "NON_ELITIST_" + tag, problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(localSearch, "Local_Search_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_steady, "Genetic_Steady_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_generational, "Genetic_Generational_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(elitist, "Elitist_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(non_elitist, "NON_ELITIST_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(localSearch, "Local_Search_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_descent, "Random_Descend_" + tag, problemList.get(i), run));
-                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(parallel_tempering, "Parallel_Tempering_" + tag, problemList.get(i), run));
+                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(parallel_tempering, "Parallel_Tempering_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(tabu_search, "Tabu_Search_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_search, "Random_Search_" + tag, problemList.get(i), run));
                 //algorithms.add(new ExperimentAlgorithm<>(nsgaii, "Random_Descend_" + tag, problemList.get(i), run));
-
             }
         }
         return algorithms;
