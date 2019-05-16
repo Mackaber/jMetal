@@ -37,12 +37,12 @@ public class JamesTabuSearch<S extends Solution<?>> extends JamesAlgorithm<S> im
 
     @Override
     public void run() {
-        tabuSearch.dispose();
         tabuSearch.start();
     }
 
     @Override
     public S getResult() {
+        tabuSearch.dispose();
         return tabuSearch.getBestSolution().getjMetalSolution();
     }
 

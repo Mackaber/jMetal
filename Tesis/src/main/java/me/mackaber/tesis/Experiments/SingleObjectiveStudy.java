@@ -212,8 +212,8 @@ public class SingleObjectiveStudy {
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(non_elitist, "NON_ELITIST_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(localSearch, "Local_Search_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_descent, "Random_Descend_" + tag, problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(parallel_tempering, "Parallel_Tempering_" + tag, problemList.get(i), run));
-                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(tabu_search, "Tabu_Search_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(parallel_tempering, "Parallel_Tempering_" + tag, problemList.get(i), run));
+                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(tabu_search, "Tabu_Search_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_search, "Random_Search_" + tag, problemList.get(i), run));
                 //algorithms.add(new ExperimentAlgorithm<>(nsgaii, "Random_Descend_" + tag, problemList.get(i), run));
             }
