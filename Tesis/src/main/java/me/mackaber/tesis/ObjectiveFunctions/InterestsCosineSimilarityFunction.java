@@ -59,4 +59,14 @@ public class InterestsCosineSimilarityFunction extends Function {
         else
             return result < 0 ? 0.0 : result;
     }
+
+    @Override
+    public String getName() {
+        return "InterestsCosineSimilarity";
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
+    }
 }

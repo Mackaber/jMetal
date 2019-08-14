@@ -17,6 +17,19 @@ public class LevelFunction extends Function {
         }
 
         StandardDeviation sd = new StandardDeviation();
-        return sd.evaluate(levels);
+        double res = sd.evaluate(levels);
+        if(res < 0.0)
+            System.out.println("X");
+        return res;
+    }
+
+    @Override
+    public String getName() {
+        return "LevelFunction";
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
     }
 }

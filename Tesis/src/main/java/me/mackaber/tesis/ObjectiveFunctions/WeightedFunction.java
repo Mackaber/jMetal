@@ -5,6 +5,7 @@ import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.InterestVector;
 import me.mackaber.tesis.Util.User;
 import org.apache.commons.math3.exception.NotANumberException;
+import org.uma.jmetal.util.point.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,5 +68,26 @@ public class WeightedFunction extends Function {
         }
 
         return result;
+    }
+
+    // This function is to evaluate the objectives if the objectives aren't normalized
+    public double evalObjectives(Point point) {
+        double result = 0.0;
+        for (int i = 0; i < getFunctions().size(); i++) {
+            result += getWeights().get(i) * point.getDimensionValue(i);
+            i++;
+        }
+
+        return result;
+    }
+
+    @Override
+    public String getName() {
+        return "WeightedFunction";
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
     }
 }

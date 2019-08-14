@@ -1,9 +1,6 @@
 package me.mackaber.tesis.Experiments;
 
-import me.mackaber.tesis.ObjectiveFunctions.GroupSizeFunction;
-import me.mackaber.tesis.ObjectiveFunctions.InterestsCosineSimilarityFunction;
-import me.mackaber.tesis.ObjectiveFunctions.LevelFunction;
-import me.mackaber.tesis.ObjectiveFunctions.ParticipationStyleFunction;
+import me.mackaber.tesis.ObjectiveFunctions.*;
 import me.mackaber.tesis.SingleObjective.GroupSolution;
 import me.mackaber.tesis.SingleObjective.GroupingProblem;
 import me.mackaber.tesis.Util.*;
@@ -35,6 +32,7 @@ import org.uma.jmetal.util.experiment.Experiment;
 import org.uma.jmetal.util.experiment.ExperimentBuilder;
 import org.uma.jmetal.util.experiment.component.ComputeQualityIndicators;
 import org.uma.jmetal.util.experiment.component.ExecuteAlgorithms;
+import org.uma.jmetal.util.experiment.component.GenerateLatexTablesWithStatistics;
 import org.uma.jmetal.util.experiment.util.ExperimentAlgorithm;
 import org.uma.jmetal.util.experiment.util.ExperimentProblem;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
@@ -77,11 +75,18 @@ public class MultiObjectiveStudy {
             problemList.add(new ExperimentProblem<>(problem)); // dataset of 20
         }
 
+        NormalizedWeightedFunction function = new NormalizedWeightedFunction()
+                .addObjectiveFunction(1.0, new GroupSizeFunction(), 0.5, 1.5)
+                .addObjectiveFunction(1.0, new ParticipationStyleFunction(), 0.001666, 1.0)
+                .addObjectiveFunction(1.0, new LevelFunction(), 0.0, 2.82843)
+                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction(), 0.0, 1.0);
+
+
         List<ExperimentAlgorithm<GroupSolution, List<GroupSolution>>> algorithmList =
                 configureAlgorithmList(problemList);
 
         Experiment<GroupSolution, List<GroupSolution>> experiment =
-                new ExperimentBuilder<GroupSolution, List<GroupSolution>>("SOS")
+                new ExperimentBuilder<GroupSolution, List<GroupSolution>>("NONI")
                         .setAlgorithmList(algorithmList)
                         .setProblemList(problemList)
                         .setExperimentBaseDirectory(".")
@@ -96,12 +101,14 @@ public class MultiObjectiveStudy {
                                 new GenerationalDistance<>(),
                                 new WFGHypervolume<>(),
                                 new InvertedGenerationalDistance<>(),
-                                new InvertedGenerationalDistancePlus<>()
+                                new InvertedGenerationalDistancePlus<>(),
+                                new SingleObjectiveFunction<>(function)
                         ))
                         .build();
 
         new ExecuteAlgorithms<>(experiment).run();
-        new ComputeQualityIndicators<>(experiment).run();
+        new ComputeQualityIndicatorsWoNorm<>(experiment).run();
+        new GenerateLatexTablesWithStatistics(experiment).run();
     }
 
 
@@ -202,15 +209,15 @@ public class MultiObjectiveStudy {
                         .setPopulationSize(100)
                         .build();
 
-                algorithms.add(new ExperimentAlgorithm<>(espea, espea.getName(), problemList.get(i), run)); // OK
-                algorithms.add(new ExperimentAlgorithm<>(mombi, mombi.getName(), problemList.get(i), run)); // OK
+                //algorithms.add(new ExperimentAlgorithm<>(espea, espea.getName(), problemList.get(i), run)); // OK
+                //algorithms.add(new ExperimentAlgorithm<>(mombi, mombi.getName(), problemList.get(i), run)); // OK
                 algorithms.add(new ExperimentAlgorithm<>(nsgaii, nsgaii.getName(), problemList.get(i), run)); // OK
-                algorithms.add(new ExperimentAlgorithm<>(nsgaiii, nsgaiii.getName(), problemList.get(i), run)); // OK
-                algorithms.add(new ExperimentAlgorithm<>(paes, paes.getName(), problemList.get(i), run)); // OK
-                algorithms.add(new ExperimentAlgorithm<>(randomSearch, randomSearch.getName(), problemList.get(i), run)); // OK
-                algorithms.add(new ExperimentAlgorithm<>(rnsgaii,rnsgaii.getName(), problemList.get(i), run)); // OK
-                algorithms.add(new ExperimentAlgorithm<>(smsemoa, smsemoa.getName(), problemList.get(i), run)); // OK
-                algorithms.add(new ExperimentAlgorithm<>(spea2, spea2.getName(), problemList.get(i), run)); // OK
+                //algorithms.add(new ExperimentAlgorithm<>(nsgaiii, nsgaiii.getName(), problemList.get(i), run)); // OK
+                //algorithms.add(new ExperimentAlgorithm<>(paes, paes.getName(), problemList.get(i), run)); // OK
+                //algorithms.add(new ExperimentAlgorithm<>(randomSearch, randomSearch.getName(), problemList.get(i), run)); // OK
+                //algorithms.add(new ExperimentAlgorithm<>(rnsgaii,rnsgaii.getName(), problemList.get(i), run)); // OK
+                //algorithms.add(new ExperimentAlgorithm<>(smsemoa, smsemoa.getName(), problemList.get(i), run)); // OK
+                //algorithms.add(new ExperimentAlgorithm<>(spea2, spea2.getName(), problemList.get(i), run)); // OK
             }
         }
         return algorithms;

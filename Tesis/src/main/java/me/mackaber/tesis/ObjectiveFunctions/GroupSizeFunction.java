@@ -13,4 +13,14 @@ public class GroupSizeFunction extends Function {
         double eval = Math.abs(group.size() - 4.5);
         return eval;
     }
+
+    @Override
+    public String getName() {
+        return "GroupSize";
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
+    }
 }

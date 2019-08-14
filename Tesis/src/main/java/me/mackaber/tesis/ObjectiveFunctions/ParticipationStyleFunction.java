@@ -18,4 +18,14 @@ public class ParticipationStyleFunction extends Function {
 
         return (1 / sum);
     }
+
+    @Override
+    public String getName() {
+        return "ParticipationStyle";
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
+    }
 }

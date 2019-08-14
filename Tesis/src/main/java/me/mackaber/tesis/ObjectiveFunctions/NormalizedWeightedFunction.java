@@ -3,6 +3,7 @@ package me.mackaber.tesis.ObjectiveFunctions;
 import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.InterestVector;
 import me.mackaber.tesis.Util.User;
+import org.uma.jmetal.util.point.Point;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,18 @@ public class NormalizedWeightedFunction extends WeightedFunction {
         int i = 0;
         for (Function function : getFunctions()) {
             result += getWeights().get(i) * ((max_values.get(i) - function.eval(groups)) / (max_values.get(i) - min_values.get(i)));
+            i++;
+        }
+
+        return result;
+    }
+
+    // This function is to evaluate the objectives if they use a normalized function
+    public double normalizedEval(Point point) {
+        double result = 0.0;
+        for (int i = 0; i < getFunctions().size(); i++) {
+            // This step is for normalizing the result (in the case of the Normalized Weighted Function)
+            result += getWeights().get(i) * ((max_values.get(i) - point.getDimensionValue(i) / (max_values.get(i) - min_values.get(i))));
             i++;
         }
 

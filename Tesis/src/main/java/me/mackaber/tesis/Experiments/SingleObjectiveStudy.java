@@ -5,8 +5,10 @@ import me.mackaber.tesis.SingleObjective.Algorithms.*;
 import me.mackaber.tesis.SingleObjective.GroupSolution;
 import me.mackaber.tesis.SingleObjective.GroupingProblem;
 import me.mackaber.tesis.SingleObjective.JamesTools.JamesAlgorithm;
+import me.mackaber.tesis.SingleObjective.JamesTools.ProgressSearchListener;
 import me.mackaber.tesis.Util.*;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 import org.jamesframework.core.search.stopcriteria.MaxSteps;
 import org.uma.jmetal.algorithm.Algorithm;
 import org.uma.jmetal.algorithm.multiobjective.nsgaii.NSGAIIBuilder;
@@ -23,12 +25,14 @@ import org.uma.jmetal.util.experiment.Experiment;
 import org.uma.jmetal.util.experiment.ExperimentBuilder;
 import org.uma.jmetal.util.experiment.component.ComputeQualityIndicators;
 import org.uma.jmetal.util.experiment.component.ExecuteAlgorithms;
+import org.uma.jmetal.util.experiment.component.GenerateLatexTablesWithStatistics;
 import org.uma.jmetal.util.experiment.util.ExperimentAlgorithm;
 import org.uma.jmetal.util.experiment.util.ExperimentProblem;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class SingleObjectiveStudy {
 
@@ -41,8 +45,8 @@ public class SingleObjectiveStudy {
 
         // Problem Definition
 
-        //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_20.csv"));
-        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_200.csv"));
+        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_20.csv"));
+        //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_200.csv"));
         //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_2000.csv"));
         //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_10001.csv"));
 
@@ -50,51 +54,61 @@ public class SingleObjectiveStudy {
 
         // Weighted Function
 
-        WeightedFunction function = new NormalizedWeightedFunction()
-                .addObjectiveFunction(1.0, new GroupSizeFunction(), 0.5, 1.5)
-                .addObjectiveFunction(1.0, new ParticipationStyleFunction(), 0.001666, 1.0)
-                .addObjectiveFunction(1.0, new LevelFunction(), 0.0, 2.82843)
-                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction(), 0.0, 1.0);
+//         WeightedFunction function = new NormalizedWeightedFunction()
+//                .addObjectiveFunction(1.0, new GroupSizeFunction(), 0.5, 1.5)
+//                .addObjectiveFunction(1.0, new ParticipationStyleFunction(), 0.001666, 1.0)
+//                .addObjectiveFunction(1.0, new LevelFunction(), 0.0, 2.82843)
+//                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction(), 0.0, 1.0);
+
+        ArrayList<Function> functions = new ArrayList<>();
+        functions.add(new GroupSizeFunction());
+        functions.add(new ParticipationStyleFunction());
+        functions.add(new LevelFunction());
+        functions.add(new InterestsCosineSimilarityFunction());
 
         for (GroupingProblem problem : problems) {
-            problem.setGroupSizeRange(3, 6)
-                    .addObjectiveFunction(function)
-                    .setVector(new InterestVector("Tesis/src/main/resources/custom_interests.json"))
-                    .setCentralTendencyMeasure(new Mean())
-                    .build();
+            for(Function function: functions) {
+                problem.setGroupSizeRange(3, 6)
+                        .addObjectiveFunction(function)
+                        .setVector(new InterestVector("Tesis/src/main/resources/custom_interests.json"))
+                        .setCentralTendencyMeasure(new Mean())
+                        .build();
 
-            problemList.add(new ExperimentProblem<>(problem)); // dataset of 20
+                problemList.add(new ExperimentProblem<>(problem)); // dataset of 20
+            }
         }
 
         List<ExperimentAlgorithm<GroupSolution, List<GroupSolution>>> algorithmList =
                 configureAlgorithmList(problemList);
 
         Experiment<GroupSolution, List<GroupSolution>> experiment =
-                new ExperimentBuilder<GroupSolution, List<GroupSolution>>("COSO")
+                new ExperimentBuilder<GroupSolution, List<GroupSolution>>("TEST")
                         .setAlgorithmList(algorithmList)
                         .setProblemList(problemList)
                         .setExperimentBaseDirectory(".")
-                        .setOutputParetoFrontFileName("DEC")
+                        .setOutputParetoFrontFileName("FUN")
                         .setOutputParetoSetFileName("VAR")
                         .setReferenceFrontDirectory("Tesis/src/main/resources/paretoFronts")
                         .setIndependentRuns(INDEPENDENT_RUNS)
                         .setNumberOfCores(5)
                         .setIndicatorList(Arrays.asList(
-                                new Epsilon<>(),
-                                new Spread<>(),
-                                new GenerationalDistance<>(),
-                                new InvertedGenerationalDistance<>(),
-                                new InvertedGenerationalDistancePlus<>()
+                                //new Epsilon<>(),
+                                //new Spread<>(),
+                                //new GenerationalDistance<>(),
+                                //new InvertedGenerationalDistance<>(),
+                                //new InvertedGenerationalDistancePlus<>()
+                                new SingleObjectiveFunction<>()
                                 )
                         ).build();
 
         new ExecuteAlgorithms<>(experiment).run();
         new ComputeQualityIndicators<>(experiment).run();
+        new GenerateLatexTablesWithStatistics(experiment).run();
     }
 
 
     static List<ExperimentAlgorithm<GroupSolution, List<GroupSolution>>> configureAlgorithmList(
-            List<ExperimentProblem<GroupSolution>> problemList) {
+            List<ExperimentProblem<GroupSolution>> problemList) throws IOException {
 
         List<ExperimentAlgorithm<GroupSolution, List<GroupSolution>>> algorithms = new ArrayList<>();
 
@@ -178,18 +192,18 @@ public class SingleObjectiveStudy {
                         mutation,minTemp,maxTemp,numReplicas);
                 parallel_tempering.getJamesAlgorithm().addStopCriterion(new MaxSteps(200));
 
-                int memorySize = 200;
+                int memorySize = 2000;
 
                 JamesAlgorithm<GroupSolution> tabu_search = new JamesTabuSearch<>(
                         problemList.get(i).getProblem(),
                         mutation, memorySize);
-                tabu_search.getJamesAlgorithm().addStopCriterion(new MaxSteps(200));
+                tabu_search.getJamesAlgorithm().addStopCriterion(new MaxRuntime(60, TimeUnit.SECONDS));
+                tabu_search.getJamesAlgorithm().addSearchListener(new ProgressSearchListener());
 
                 JamesAlgorithm<GroupSolution> random_search = new JamesRandomSearch<>(
                         problemList.get(i).getProblem(),
                         mutation);
                 random_search.getJamesAlgorithm().addStopCriterion(new MaxSteps(200));
-
 
 
                 // ----------- MULTIOBJECTIVE --------------
@@ -207,13 +221,13 @@ public class SingleObjectiveStudy {
 
 
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_steady, "Genetic_Steady_" + tag, problemList.get(i), run));
-                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_generational, "Genetic_Generational_" + tag, problemList.get(i), run));
+                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_generational, "Genetic_Generational_" + tag + "_" + problemList.get(i).getProblem(), problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(elitist, "Elitist_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(non_elitist, "NON_ELITIST_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(localSearch, "Local_Search_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_descent, "Random_Descend_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(parallel_tempering, "Parallel_Tempering_" + tag, problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(tabu_search, "Tabu_Search_" + tag, problemList.get(i), run));
+                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(tabu_search, "Tabu_Search_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_search, "Random_Search_" + tag, problemList.get(i), run));
                 //algorithms.add(new ExperimentAlgorithm<>(nsgaii, "Random_Descend_" + tag, problemList.get(i), run));
             }
