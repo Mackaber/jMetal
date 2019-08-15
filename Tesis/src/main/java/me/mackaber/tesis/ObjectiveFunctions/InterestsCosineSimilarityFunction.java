@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class InterestsCosineSimilarityFunction extends Function {
+    private static final java.util.function.Function<List<User>,Double> CACHED = Memoizer.memoize(InterestsCosineSimilarityFunction::uncached);
 
     private static Double cosineSimilarity(HashMap<String, Double> vector1, HashMap<String, Double> vector2) {
         // Merge Vectors before comparing...
@@ -39,12 +40,16 @@ public class InterestsCosineSimilarityFunction extends Function {
 
 
     @Override
-    public double eval(List<Integer> group) {
+    public double eval(List<User> group) {
+        return CACHED.apply(group);
+    }
+
+    public static double uncached(List<User> group) {
         List<Double> evals = new ArrayList<>();
         for (int i = 0; i < group.size() - 1; i++) {
             for (int j = i + 1; j < group.size(); j++) {
-                HashMap<String, Double> vect1 = (HashMap<String, Double>) getProblem().getUsers().get(i).getInterestVector().clone();
-                HashMap<String, Double> vect2 = (HashMap<String, Double>) getProblem().getUsers().get(j).getInterestVector().clone();
+                HashMap<String, Double> vect1 = (HashMap<String, Double>) group.get(i).getInterestVector().clone();
+                HashMap<String, Double> vect2 = (HashMap<String, Double>) group.get(i).getInterestVector().clone();
 
                 evals.add(cosineSimilarity(vect1, vect2));
             }

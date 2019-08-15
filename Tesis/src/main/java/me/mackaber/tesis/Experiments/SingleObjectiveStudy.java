@@ -45,37 +45,35 @@ public class SingleObjectiveStudy {
 
         // Problem Definition
 
-        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_20.csv"));
+        //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_20.csv"));
         //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_200.csv"));
-        //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_2000.csv"));
+        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_2000.csv"));
         //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_10001.csv"));
 
         List<ExperimentProblem<GroupSolution>> problemList = new ArrayList<>();
 
         // Weighted Function
 
-//         WeightedFunction function = new NormalizedWeightedFunction()
-//                .addObjectiveFunction(1.0, new GroupSizeFunction(), 0.5, 1.5)
-//                .addObjectiveFunction(1.0, new ParticipationStyleFunction(), 0.001666, 1.0)
-//                .addObjectiveFunction(1.0, new LevelFunction(), 0.0, 2.82843)
-//                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction(), 0.0, 1.0);
+        WeightedFunction function = new NormalizedWeightedFunction()
+                .addObjectiveFunction(1.0, new GroupSizeFunction(), 0.5, 1.5)
+                .addObjectiveFunction(1.0, new ParticipationStyleFunction(), 0.001666, 1.0)
+                .addObjectiveFunction(1.0, new LevelFunction(), 0.0, 2.82843)
+                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction(), 0.0, 1.0);
 
-        ArrayList<Function> functions = new ArrayList<>();
-        functions.add(new GroupSizeFunction());
-        functions.add(new ParticipationStyleFunction());
-        functions.add(new LevelFunction());
-        functions.add(new InterestsCosineSimilarityFunction());
+//        ArrayList<Function> functions = new ArrayList<>();
+//        functions.add(new GroupSizeFunction());
+//        functions.add(new ParticipationStyleFunction());
+//        functions.add(new LevelFunction());
+//        functions.add(new InterestsCosineSimilarityFunction());
 
         for (GroupingProblem problem : problems) {
-            for(Function function: functions) {
-                problem.setGroupSizeRange(3, 6)
-                        .addObjectiveFunction(function)
-                        .setVector(new InterestVector("Tesis/src/main/resources/custom_interests.json"))
-                        .setCentralTendencyMeasure(new Mean())
-                        .build();
+            problem.setGroupSizeRange(3, 6)
+                    .addObjectiveFunction(function)
+                    .setVector(new InterestVector("Tesis/src/main/resources/custom_interests.json"))
+                    .setCentralTendencyMeasure(new Mean())
+                    .build();
 
-                problemList.add(new ExperimentProblem<>(problem)); // dataset of 20
-            }
+            problemList.add(new ExperimentProblem<>(problem)); // dataset of 20
         }
 
         List<ExperimentAlgorithm<GroupSolution, List<GroupSolution>>> algorithmList =
@@ -92,18 +90,18 @@ public class SingleObjectiveStudy {
                         .setIndependentRuns(INDEPENDENT_RUNS)
                         .setNumberOfCores(5)
                         .setIndicatorList(Arrays.asList(
-                                //new Epsilon<>(),
-                                //new Spread<>(),
-                                //new GenerationalDistance<>(),
-                                //new InvertedGenerationalDistance<>(),
-                                //new InvertedGenerationalDistancePlus<>()
-                                new SingleObjectiveFunction<>()
+                                new Epsilon<>(),
+                                new Spread<>(),
+                                new GenerationalDistance<>(),
+                                new InvertedGenerationalDistance<>(),
+                                new InvertedGenerationalDistancePlus<>()
+                                //new SingleObjectiveFunction<>()
                                 )
                         ).build();
 
         new ExecuteAlgorithms<>(experiment).run();
-        new ComputeQualityIndicators<>(experiment).run();
-        new GenerateLatexTablesWithStatistics(experiment).run();
+        //new ComputeQualityIndicators<>(experiment).run();
+        //new GenerateLatexTablesWithStatistics(experiment).run();
     }
 
 
@@ -112,7 +110,7 @@ public class SingleObjectiveStudy {
 
         List<ExperimentAlgorithm<GroupSolution, List<GroupSolution>>> algorithms = new ArrayList<>();
 
-        int popSize = 20;
+        int popSize = 200;
         int genNum = 200;
         String tag = String.format("%s_%s_%s_%s", INDEPENDENT_RUNS, popSize, genNum, new Date().getTime());
 
@@ -189,7 +187,7 @@ public class SingleObjectiveStudy {
 
                 JamesAlgorithm<GroupSolution> parallel_tempering = new JamesParallelTempering<>(
                         problemList.get(i).getProblem(),
-                        mutation,minTemp,maxTemp,numReplicas);
+                        mutation, minTemp, maxTemp, numReplicas);
                 parallel_tempering.getJamesAlgorithm().addStopCriterion(new MaxSteps(200));
 
                 int memorySize = 2000;

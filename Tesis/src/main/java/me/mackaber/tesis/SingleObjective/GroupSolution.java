@@ -3,13 +3,12 @@ package me.mackaber.tesis.SingleObjective;
 import me.mackaber.tesis.Util.CombinationProblem;
 import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.Groups;
+import me.mackaber.tesis.Util.User;
 import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.solution.impl.AbstractGenericSolution;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class GroupSolution extends AbstractGenericSolution<Integer, CombinationProblem> implements GroupingSolution<Integer> {
     private Groups groups;
@@ -54,6 +53,16 @@ public class GroupSolution extends AbstractGenericSolution<Integer, CombinationP
 
     public Groups getGroups() {
         return groups;
+    }
+
+    public List<User> getUserGroup(int i) {
+        List<User> users = new ArrayList<>();
+
+        for(Integer j: groups.getInternalGroups().get(i)) {
+            users.add(problem.getUsers().get(j));
+        }
+
+        return users;
     }
 
     public GroupSolution setGroups(Groups groups) {

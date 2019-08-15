@@ -20,7 +20,7 @@ public class NormalizedWeightedFunction extends WeightedFunction {
     }
 
     @Override
-    public double eval(List<Integer> groups) {
+    public double eval(List<User> groups) {
         double result = 0.0;
         int i = 0;
         for (Function function : getFunctions()) {

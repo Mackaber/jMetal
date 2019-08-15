@@ -2,6 +2,7 @@ package me.mackaber.tesis.Util;
 
 import me.mackaber.tesis.SingleObjective.DefaultGroupSolution;
 import me.mackaber.tesis.SingleObjective.GroupSolution;
+import me.mackaber.tesis.SingleObjective.GroupingProblem;
 import org.uma.jmetal.util.pseudorandom.BoundedRandomGenerator;
 import org.uma.jmetal.util.pseudorandom.JMetalRandom;
 import org.uma.jmetal.util.pseudorandom.RandomGenerator;

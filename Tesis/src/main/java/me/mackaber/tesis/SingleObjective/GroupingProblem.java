@@ -39,7 +39,6 @@ public class GroupingProblem extends CombinationProblem {
     }
 
     public GroupingProblem addObjectiveFunction(Function function) {
-        function.setProblem(this);
         this.functions.add(function);
         return this;
     }
@@ -95,7 +94,7 @@ public class GroupingProblem extends CombinationProblem {
             int n_groups = solution.getGroups().getInternalGroups().size();
             double[] results = new double[n_groups];
             for (int i = 0; i < n_groups - 1; i++) {
-                List<Integer> group = solution.getGroups().getInternalGroups().get(i);
+                List<User> group = solution.getUserGroup(i);
                 if (group.size() > 0)
                     results[i] = (function.eval(group));
             }

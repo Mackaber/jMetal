@@ -9,11 +9,11 @@ import java.util.List;
 public class ParticipationStyleFunction extends Function {
 
     @Override
-    public double eval(List<Integer> group) {
+    public double eval(List<User> group) {
         Double sum = 0.0;
 
         for (int i = 0; i < group.size(); i++) {
-            sum += getProblem().getUsers().get(i).getPart_prc();
+            sum += group.get(i).getPart_prc();
         }
 
         return (1 / sum);

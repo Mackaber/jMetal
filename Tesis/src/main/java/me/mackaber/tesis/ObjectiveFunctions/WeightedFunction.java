@@ -26,7 +26,6 @@ public class WeightedFunction extends Function {
     }
 
     public WeightedFunction addObjectiveFunction(double weight, Function function) {
-        function.setProblem(getProblem());
         this.functions.add(function);
         this.weights.add(weight);
         return this;
@@ -50,16 +49,9 @@ public class WeightedFunction extends Function {
         return this;
     }
 
-    @Override
-    public void setProblem(GroupingProblem problem) {
-        super.setProblem(problem);
-        for(Function function: functions){
-            function.setProblem(problem);
-        }
-    }
 
     @Override
-    public double eval(List<Integer> group) {
+    public double eval(List<User> group) {
         double result = 0.0;
         int i = 0;
         for (Function function : functions) {

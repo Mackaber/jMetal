@@ -7,20 +7,15 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import java.util.List;
 
 public class LevelFunction extends Function {
-    @Override
-    public double eval(List<Integer> group) {
-        int numberOfUsers = group.size();
-        double[] levels = new double[numberOfUsers];
+    private static final java.util.function.Function<List<User>,Double> CACHED = Memoizer.memoize(LevelFunction::uncached);
 
-        for (int i = 0; i < numberOfUsers - 1; i++) {
-            levels[i] = Double.valueOf(getProblem().getUsers().get(i).getLevel());
-        }
+    public double eval(List<User> group) {
+        return CACHED.apply(group);
+    }
 
+    private static double uncached(List<User> group) {
         StandardDeviation sd = new StandardDeviation();
-        double res = sd.evaluate(levels);
-        if(res < 0.0)
-            System.out.println("X");
-        return res;
+        return sd.evaluate(group.stream().mapToDouble(User::getLevel).toArray());
     }
 
     @Override

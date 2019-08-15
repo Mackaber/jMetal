@@ -9,9 +9,8 @@ import java.util.List;
 public class GroupSizeFunction extends Function {
 
     @Override
-    public double eval(List<Integer> group) {
-        double eval = Math.abs(group.size() - 4.5);
-        return eval;
+    public double eval(List<User> group) {
+        return Math.abs(group.size() - 4.5);
     }
 
     @Override
