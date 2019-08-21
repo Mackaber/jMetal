@@ -14,6 +14,7 @@ import java.util.List;
 public class WeightedFunction extends Function {
     private ArrayList<Function> functions;
     private ArrayList<Double> weights;
+    private double bias = 0.0;
 
     public WeightedFunction() {
         this.functions = new ArrayList<>();
@@ -28,6 +29,11 @@ public class WeightedFunction extends Function {
     public WeightedFunction addObjectiveFunction(double weight, Function function) {
         this.functions.add(function);
         this.weights.add(weight);
+        return this;
+    }
+
+    public WeightedFunction addBias(double bias) {
+        this.bias = bias;
         return this;
     }
 
@@ -59,7 +65,7 @@ public class WeightedFunction extends Function {
             i++;
         }
 
-        return result;
+        return result + bias;
     }
 
     // This function is to evaluate the objectives if the objectives aren't normalized

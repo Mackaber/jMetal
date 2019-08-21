@@ -49,7 +49,7 @@ public class InterestsCosineSimilarityFunction extends Function {
         for (int i = 0; i < group.size() - 1; i++) {
             for (int j = i + 1; j < group.size(); j++) {
                 HashMap<String, Double> vect1 = (HashMap<String, Double>) group.get(i).getInterestVector().clone();
-                HashMap<String, Double> vect2 = (HashMap<String, Double>) group.get(i).getInterestVector().clone();
+                HashMap<String, Double> vect2 = (HashMap<String, Double>) group.get(j).getInterestVector().clone();
 
                 evals.add(cosineSimilarity(vect1, vect2));
             }

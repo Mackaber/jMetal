@@ -54,12 +54,18 @@ public class SingleObjectiveStudy {
 
         // Weighted Function
 
-        WeightedFunction function = new NormalizedWeightedFunction()
-                .addObjectiveFunction(1.0, new GroupSizeFunction(), 0.5, 1.5)
-                .addObjectiveFunction(1.0, new ParticipationStyleFunction(), 0.001666, 1.0)
-                .addObjectiveFunction(1.0, new LevelFunction(), 0.0, 2.82843)
-                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction(), 0.0, 1.0);
+//        WeightedFunction function = new NormalizedWeightedFunction()
+//                .addObjectiveFunction(1.0, new GroupSizeFunction(), 0.5, 1.5)
+//                .addObjectiveFunction(1.0, new ParticipationStyleFunction(), 0.001666, 1.0)
+//                .addObjectiveFunction(1.0, new LevelFunction(), 0.0, 2.82843)
+//                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction(), 0.0, 1.0);
 
+
+        WeightedFunction function = new WeightedFunction()
+                .addObjectiveFunction(0.25,new GroupSizeFunction())
+                .addObjectiveFunction(0.250417,new ParticipationStyleFunction())
+                .addObjectiveFunction(0.0883883, new LevelFunction())
+                .addObjectiveFunction(0.25 , new InterestsCosineSimilarityFunction());
 //        ArrayList<Function> functions = new ArrayList<>();
 //        functions.add(new GroupSizeFunction());
 //        functions.add(new ParticipationStyleFunction());
