@@ -48,7 +48,7 @@ public class GenerateFriedmanTestTables<Result> implements ExperimentComponent {
   private int numberOfProblems ;
 
   public GenerateFriedmanTestTables(Experiment<?, Result> experimentConfiguration) {
-    this.experiment = experimentConfiguration ;
+    this.experiment = experimentConfiguration;
 
     numberOfAlgorithms = experiment.getAlgorithmList().size() ;
     numberOfProblems = experiment.getProblemList().size() ;

@@ -32,16 +32,7 @@ public class CombinationNPointCrossoverWithoutRepair implements CrossoverOperato
             throw new JMetalException("Point Crossover requires + " + getNumberOfRequiredParents() + " parents, but got " + s.size());
         }
 
-
-        if (randomNumberGenerator.nextDouble() < probability && GroupSolution.checkSolution(s)) {
-            List<GroupSolution> result = doCrossover(s);
-            if (GroupSolution.checkSolution(result))
-                return result;
-            else
-                return s;
-        } else {
-            return s;
-        }
+        return doCrossover(s);
     }
 
     private List<GroupSolution> doCrossover(List<GroupSolution> s) {

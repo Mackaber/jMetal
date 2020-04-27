@@ -4,11 +4,12 @@ import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.User;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
+import weka.classifiers.trees.j48.EntropyBasedSplitCrit;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class InterestsCosineSimilarityFunction extends Function {
     private static final java.util.function.Function<List<User>,Double> CACHED = Memoizer.memoize(InterestsCosineSimilarityFunction::uncached);
@@ -63,6 +64,38 @@ public class InterestsCosineSimilarityFunction extends Function {
             return 1.0;
         else
             return result < 0 ? 0.0 : result;
+    }
+
+    public HashMap<Integer,Map<Integer,Double>> getRankings(List<User> group) {
+        HashMap<Integer,Map<Integer,Double>> rankings = new HashMap<>();
+        for (int i = 0; i < group.size(); i++) {
+            User user1 = group.get(i);
+            HashMap<Integer, Double> values = new HashMap<>();
+
+            //for (int j = i + 1; j < group.size(); j++) {
+            for (int j = 0; j < group.size(); j++) {
+                User user2 = group.get(j);
+
+                HashMap<String, Double> vect1 = (HashMap<String, Double>) user1.getInterestVector().clone();
+                HashMap<String, Double> vect2 = (HashMap<String, Double>) user2.getInterestVector().clone();
+
+                Integer levelDifference = (5 - Math.abs(user1.getLevel() - user2.getLevel()))/5;
+                Math.abs((user1.getLevel() - user2.getLevel()));
+                Double cosineDistance = cosineSimilarity(vect1, vect2);
+                values.put(user2.getId(), 0.5 * cosineDistance + 0.5 * levelDifference);
+            }
+
+            // Sort the values
+            Comparator<Map.Entry<Integer, Double>> comparator = Map.Entry.comparingByValue();
+
+            Map<Integer,Double> sortedValues = values.entrySet().stream()
+                    .sorted(comparator.reversed())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1,e2) -> e2, LinkedHashMap::new));
+
+            rankings.put(user1.getId(),sortedValues);
+
+        }
+        return rankings;
     }
 
     @Override

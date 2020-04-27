@@ -11,6 +11,10 @@ import java.util.List;
 
 public class DefaultGroupSolution extends GroupSolution implements GroupingSolution<Integer> {
 
+    public DefaultGroupSolution(DefaultGroupSolution solution) {
+        super(solution);
+    }
+
     public DefaultGroupSolution(GroupingProblem problem) {
         super(problem);
         setGroups(new Groups(problem.getNumberOfVariables()));
@@ -19,10 +23,13 @@ public class DefaultGroupSolution extends GroupSolution implements GroupingSolut
         }
     }
 
-    public DefaultGroupSolution(DefaultGroupSolution solution) {
-        super(solution);
+    public DefaultGroupSolution(GroupingProblem problem, String[] variables) {
+        super(problem);
+        setGroups(new Groups(problem.getNumberOfVariables()));
+        for (int i = 0; i < problem.getNumberOfVariables(); i++) {
+            setVariableValue(i, Integer.parseInt(variables[i]));
+        }
     }
-
 
     @Override
     public String getVariableValueString(int index) {

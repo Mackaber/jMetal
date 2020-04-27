@@ -141,6 +141,15 @@ public class BOTHStudy {
 
                 // Genetic Algorithm
 
+                Algorithm<GroupSolution> gga = new GeneticAlgorithmBuilder<>(
+                        problemList.get(i).getProblem(),
+                        crossover,
+                        mutation)
+                        .setSelectionOperator(selection)
+                        .setPopulationSize(popSize)
+                        .setMaxEvaluations(genNum * popSize)
+                        .build();
+                /*
                 Algorithm<GroupSolution> genetic_generational = new GeneticAlgorithmBuilder<>(
                         problemList.get(i).getProblem(),
                         crossover,
@@ -150,7 +159,7 @@ public class BOTHStudy {
                         .setMaxEvaluations(genNum * popSize)
                         .setSolutionListEvaluator(new MultithreadedSolutionListEvaluator(10, problemList.get(i).getProblem()))
                         .build();
-
+                   */
 
                 Algorithm<GroupSolution> genetic_steady = new GeneticAlgorithmBuilder<>(
                         problemList.get(i).getProblem(),
@@ -285,7 +294,7 @@ public class BOTHStudy {
                         .build();
 
                 // SINGLE
-
+               //algorithms.add(new ExperimentAlgorithm<>(gga, gga.getName(), problemList.get(i), run));
                 algorithms.add(new ExperimentAlgorithm<>(espea, espea.getName(), problemList.get(i), run)); // OK
                 algorithms.add(new ExperimentAlgorithm<>(mombi, mombi.getName(), problemList.get(i), run)); // OK
                 algorithms.add(new ExperimentAlgorithm<>(nsgaii, nsgaii.getName(), problemList.get(i), run)); // OK
@@ -298,16 +307,16 @@ public class BOTHStudy {
 
                 // MULTI
 
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_descent, "Random_Descent", problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(parallel_tempering, "Parallel_Tempering", problemList.get(i), run));
-                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(tabu_search, "Tabu_Search", problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_search, "Random_Search", problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(localSearch, "Local_Search", problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_steady, "Genetic_Steady", problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_generational, "Genetic_Generational", problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(elitist, "Elitist", problemList.get(i), run));
-                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(non_elitist, "NON_ELITIST", problemList.get(i), run));
-
+                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_descent, "Random_Descent", problemList.get(i), run));
+                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(parallel_tempering, "Parallel_Tempering", problemList.get(i), run));
+                // //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(tabu_search, "Tabu_Search", problemList.get(i), run));
+                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(random_search, "Random_Search", problemList.get(i), run));
+                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(localSearch, "Local_Search", problemList.get(i), run));
+                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_steady, "Genetic_Steady", problemList.get(i), run));
+                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_generational, "Genetic_Generational", problemList.get(i), run));
+                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(elitist, "Elitist", problemList.get(i), run));
+                // algorithms.add(new SingleObjectiveExperimentAlgorithm<>(non_elitist, "NON_ELITIST", problemList.get(i), run));
+//
             }
         }
         return algorithms;

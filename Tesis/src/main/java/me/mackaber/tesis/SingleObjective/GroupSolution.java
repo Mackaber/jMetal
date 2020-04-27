@@ -4,6 +4,7 @@ import me.mackaber.tesis.Util.CombinationProblem;
 import me.mackaber.tesis.Util.Function;
 import me.mackaber.tesis.Util.Groups;
 import me.mackaber.tesis.Util.User;
+import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.solution.Solution;
 import org.uma.jmetal.solution.impl.AbstractGenericSolution;
 
@@ -41,6 +42,22 @@ public class GroupSolution extends AbstractGenericSolution<Integer, CombinationP
         attributes = new HashMap<>(solution.attributes);
     }
 
+    public GroupSolution(GroupSolution solution, GroupingProblem problemHolder) {
+        super(problemHolder);
+
+        setGroups(solution.getGroups());
+
+        for (int i = 0; i < problem.getNumberOfVariables(); i++) {
+            setAttributeWithoutChange(i, solution.getVariableValue(i));
+        }
+
+        for (int i = 0; i < problem.getNumberOfObjectives(); i++) {
+            setObjective(i, 0.0);
+        }
+
+        attributes = new HashMap<>(solution.attributes);
+    }
+
     public static boolean checkSolution(List<GroupSolution> s) {
         for (GroupSolution solution : s) {
             for (List<Integer> group : solution.getGroups().getInternalGroups()) {
@@ -68,6 +85,14 @@ public class GroupSolution extends AbstractGenericSolution<Integer, CombinationP
     public GroupSolution setGroups(Groups groups) {
         this.groups = groups;
         return this;
+    }
+
+    public Problem<GroupSolution> getProblem() {
+        return problem;
+    }
+
+    public void setProblem(GroupingProblem problem) {
+        this.problem = problem;
     }
 
     public GroupSolution repair() {
@@ -126,6 +151,10 @@ public class GroupSolution extends AbstractGenericSolution<Integer, CombinationP
     @Override
     public Solution<Integer> copy() {
         return new GroupSolution(this);
+    }
+
+    public Solution<Integer> copy(GroupingProblem problem) {
+        return new GroupSolution(this, problem);
     }
 
     @Override

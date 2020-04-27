@@ -4,9 +4,9 @@ import me.mackaber.tesis.Util.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.math3.exception.NotANumberException;
 import org.apache.commons.math3.stat.descriptive.AbstractStorelessUnivariateStatistic;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.stat.descriptive.rank.Max;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,6 +25,7 @@ public class GroupingProblem extends CombinationProblem {
     private List<User> users;
     private Type type;
     private InterestVector vector;
+    private List<Double> weights = new ArrayList<>();
 
     public enum Type {SINGLE_OBJECTIVE, MULTI_OBJECTIVE}
 
@@ -58,6 +59,10 @@ public class GroupingProblem extends CombinationProblem {
         return this;
     }
 
+    public InterestVector getVector() {
+        return vector;
+    }
+
     public String getUserFile() {
         return userFile;
     }
@@ -71,25 +76,17 @@ public class GroupingProblem extends CombinationProblem {
         setName("Grouping_Problem_" + usersSize);
     }
 
-    public DefaultGroupSolution createHolder(GroupSolution solution) {
+    public void buildHolder(GroupSolution solution) {
         setNumberOfVariables(solution.getNumberOfVariables());
         setNumberOfObjectives(functions.size());
-
-        DefaultGroupSolution holder = new DefaultGroupSolution(this);
-
-        for (int i = 0; i < solution.getNumberOfVariables(); i++) {
-            holder.setAttributeWithoutChange(i, solution.getVariableValue(i));
-        }
-
-        evaluate(holder);
-        return holder;
     }
 
     @Override
     public void evaluate(GroupSolution solution) {
-        double fitness = 0;
         int j = 0;
 
+        // Default Weighted Sum Method
+        double fitness = 0;
         for (Function function : functions) {
             int n_groups = solution.getGroups().getInternalGroups().size();
             double[] results = new double[n_groups];

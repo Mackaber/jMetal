@@ -17,7 +17,10 @@ import org.uma.jmetal.algorithm.singleobjective.geneticalgorithm.GeneticAlgorith
 import org.uma.jmetal.operator.MutationOperator;
 import org.uma.jmetal.operator.SelectionOperator;
 import org.uma.jmetal.operator.impl.selection.BinaryTournamentSelection;
+import org.uma.jmetal.problem.Problem;
 import org.uma.jmetal.qualityindicator.impl.*;
+import org.uma.jmetal.qualityindicator.impl.hypervolume.PISAHypervolume;
+import org.uma.jmetal.qualityindicator.impl.hypervolume.WFGHypervolume;
 import org.uma.jmetal.util.comparator.DominanceComparator;
 import org.uma.jmetal.util.comparator.RankingAndCrowdingDistanceComparator;
 import org.uma.jmetal.util.evaluator.impl.MultithreadedSolutionListEvaluator;
@@ -45,27 +48,29 @@ public class SingleObjectiveStudy {
 
         // Problem Definition
 
-        //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_20.csv"));
+        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_20.csv"));
         //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_200.csv"));
-        problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_2000.csv"));
+        //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_2000.csv"));
         //problems.add(new GroupingProblem("Tesis/src/main/resources/synthetic_10001.csv"));
 
         List<ExperimentProblem<GroupSolution>> problemList = new ArrayList<>();
 
         // Weighted Function
 
-//        WeightedFunction function = new NormalizedWeightedFunction()
-//                .addObjectiveFunction(1.0, new GroupSizeFunction(), 0.5, 1.5)
-//                .addObjectiveFunction(1.0, new ParticipationStyleFunction(), 0.001666, 1.0)
-//                .addObjectiveFunction(1.0, new LevelFunction(), 0.0, 2.82843)
-//                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction(), 0.0, 1.0);
+        /*WeightedFunction function = new NormalizedWeightedFunction()
+                .addObjectiveFunction(1.0, new GroupSizeFunction(), 0.5, 1.5)
+                .addObjectiveFunction(1.0, new ParticipationStyleFunction(), 0.001666, 1.0)
+                .addObjectiveFunction(1.0, new LevelFunction(), 0.0, 2.82843)
+                .addObjectiveFunction(1.0, new InterestsCosineSimilarityFunction(), 0.0, 1.0);*/
 
 
-        WeightedFunction function = new WeightedFunction()
-                .addObjectiveFunction(0.25,new GroupSizeFunction())
-                .addObjectiveFunction(0.250417,new ParticipationStyleFunction())
-                .addObjectiveFunction(0.0883883, new LevelFunction())
-                .addObjectiveFunction(0.25 , new InterestsCosineSimilarityFunction());
+//        WeightedFunction function = new WeightedFunction()
+//                .addObjectiveFunction(0.25,new GroupSizeFunction())
+//                .addObjectiveFunction(0.250417,new ParticipationStyleFunction())
+//                .addObjectiveFunction(0.0883883, new LevelFunction())
+//                .addObjectiveFunction(0.25 , new InterestsCosineSimilarityFunction());
+
+
 //        ArrayList<Function> functions = new ArrayList<>();
 //        functions.add(new GroupSizeFunction());
 //        functions.add(new ParticipationStyleFunction());
@@ -74,11 +79,14 @@ public class SingleObjectiveStudy {
 
         for (GroupingProblem problem : problems) {
             problem.setGroupSizeRange(3, 6)
-                    .addObjectiveFunction(function)
+                    .setType(GroupingProblem.Type.SINGLE_OBJECTIVE)
+                    .addObjectiveFunction(new GroupSizeFunction())
+                    .addObjectiveFunction(new ParticipationStyleFunction())
+                    .addObjectiveFunction(new LevelFunction())
+                    .addObjectiveFunction(new InterestsCosineSimilarityFunction())
                     .setVector(new InterestVector("Tesis/src/main/resources/custom_interests.json"))
                     .setCentralTendencyMeasure(new Mean())
                     .build();
-
             problemList.add(new ExperimentProblem<>(problem)); // dataset of 20
         }
 
@@ -101,12 +109,12 @@ public class SingleObjectiveStudy {
                                 new GenerationalDistance<>(),
                                 new InvertedGenerationalDistance<>(),
                                 new InvertedGenerationalDistancePlus<>()
-                                //new SingleObjectiveFunction<>()
+                                //new WFGHypervolume<>()
                                 )
                         ).build();
 
         new ExecuteAlgorithms<>(experiment).run();
-        //new ComputeQualityIndicators<>(experiment).run();
+        new  ComputeQualityIndicators<>(experiment).run();
         //new GenerateLatexTablesWithStatistics(experiment).run();
     }
 
@@ -116,8 +124,8 @@ public class SingleObjectiveStudy {
 
         List<ExperimentAlgorithm<GroupSolution, List<GroupSolution>>> algorithms = new ArrayList<>();
 
-        int popSize = 200;
-        int genNum = 200;
+        int popSize = 10;
+        int genNum = 10;
         String tag = String.format("%s_%s_%s_%s", INDEPENDENT_RUNS, popSize, genNum, new Date().getTime());
 
 
@@ -125,8 +133,13 @@ public class SingleObjectiveStudy {
         selection = new BinaryTournamentSelection<>(new RankingAndCrowdingDistanceComparator<>());
 
 
+        double[][] weights = new double[24][4];
+
         for (int run = 0; run < INDEPENDENT_RUNS; run++) {
+            double[] weight = weights[run];
             for (int i = 0; i < problemList.size(); i++) {
+
+                GroupingProblem problem = (GroupingProblem) problemList.get(i).getProblem();
 
                 // Parameters and stuff
                 //CombinationNPointCrossover crossover = new CombinationNPointCrossover(0.9, problemList.get(i).getProblem().getNumberOfVariables());
@@ -139,7 +152,7 @@ public class SingleObjectiveStudy {
                 // Genetic Algorithm
 
                 Algorithm<GroupSolution> genetic_generational = new GeneticAlgorithmBuilder<>(
-                        problemList.get(i).getProblem(),
+                        problem,
                         crossover,
                         mutation)
                         .setSelectionOperator(selection)
@@ -150,7 +163,7 @@ public class SingleObjectiveStudy {
 
 
                 Algorithm<GroupSolution> genetic_steady = new GeneticAlgorithmBuilder<>(
-                        problemList.get(i).getProblem(),
+                        problem,
                         crossover,
                         mutation)
                         .setSelectionOperator(selection)
@@ -224,7 +237,7 @@ public class SingleObjectiveStudy {
                         .build();
 
 
-                //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_steady, "Genetic_Steady_" + tag, problemList.get(i), run));
+                algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_steady, "Genetic_Steady_" + tag, problemList.get(i), run));
                 algorithms.add(new SingleObjectiveExperimentAlgorithm<>(genetic_generational, "Genetic_Generational_" + tag + "_" + problemList.get(i).getProblem(), problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(elitist, "Elitist_" + tag, problemList.get(i), run));
                 //algorithms.add(new SingleObjectiveExperimentAlgorithm<>(non_elitist, "NON_ELITIST_" + tag, problemList.get(i), run));
